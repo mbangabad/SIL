@@ -87,12 +87,20 @@ Each package has standard scripts:
 - [x] PHASE 5: All 12 game plugins complete
 - [x] PHASE 6: Platform features foundation - Part 1
 - [x] PHASE 6: API endpoints and profile pages - Part 2
+- [x] PHASE 7: Testing and deployment infrastructure
+- [x] Real embeddings implementation (File, Supabase, Mock providers)
+- [x] Complete Supabase integration (pgvector, RLS, migrations)
+- [x] **13 new semantic word games** (Tier A, B, C)
 
-### 🚧 In Progress
+### 🚧 Remaining Work
 
-- [ ] PHASE 7: Testing and deployment
+- [ ] Game play UI pages (`/play/[gameId]`)
+- [ ] Game state management integration
+- [ ] Comprehensive test coverage (game-specific tests)
 
-## Implemented Games (12 Total)
+## Implemented Games (25 Total)
+
+### Original Games (12)
 
 ### ✅ GRIP
 **Theme-based word selection** — Pick the word most similar to a hidden theme
@@ -153,6 +161,79 @@ Skills: Decisiveness, Intuition, Semantic Precision
 **Cyclical semantic chains** — Build a semantic chain that loops back to start
 Modes: Journey, Endurance
 Skills: Circular Reasoning, Semantic Closure, Narrative Coherence
+
+### New Semantic Word Games (13)
+
+**Tier A: Semantic Foundation**
+
+### ✅ TRIBES
+**Cluster selection** — Choose the word cluster matching a hidden theme
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Pattern Recognition, Cluster Analysis, Theme Inference
+
+### ✅ ECHOCHAIN
+**Semantic resonance** — Enter words with high semantic similarity to prompt
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Associative Thinking, Semantic Fluency, Resonance Detection
+
+### ✅ GHOST
+**Word inference** — Guess the hidden word from semantic clues
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Deductive Reasoning, Pattern Completion, Semantic Inference
+
+### ✅ MOTIF
+**Prototype selection** — Pick the word that best represents a semantic cluster
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Prototype Detection, Cluster Centrality, Representative Thinking
+
+### ✅ FLOCK
+**Semantic filtering** — Tap only words related to hidden theme in word stream
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Executive Function, Theme Detection, Rapid Classification
+
+**Tier B: Advanced Semantics**
+
+### ✅ MERGE
+**Semantic blending** — Find the word that blends two anchor concepts
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Conceptual Fusion, Midpoint Detection, Creative Synthesis
+
+### ✅ PIVOTWORD
+**Pivot selection** — Find the word that best connects two anchor words
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Bridging, Connection Finding, Semantic Pathfinding
+
+### ✅ RADIAL
+**Center identification** — Select the word nearest to conceptual center
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Centroid Detection, Spatial Reasoning, Cluster Navigation
+
+### ✅ TRACEWORD
+**Gradient tracking** — Find the next step along a semantic gradient
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Gradient Perception, Directional Thinking, Path Following
+
+### ✅ SHARD
+**Word reconstruction** — Guess the original word from semantic fragments
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Pattern Completion, Reconstruction, Semantic Memory
+
+**Tier C: Expert Semantics**
+
+### ✅ SPOKE
+**Triangle selection** — Pick two words forming strongest semantic triangle
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Geometric Reasoning, Triangle Coherence, Multi-word Relationships
+
+### ✅ WARPWORD
+**Transformation tracking** — Guess how a word has been semantically warped
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Transformation Detection, Interpolation, Change Perception
+
+### ✅ VECTOR
+**Gradient positioning** — Position slider on semantic gradient between anchors
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Precision Positioning, Gradient Mapping, Spatial Calibration
 
 ## Game Plugin Architecture
 
