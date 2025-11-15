@@ -38,6 +38,8 @@ monorepo/
 - **HotColdMeter**: Gradient heat visualization
 - **InputBox**: Text input for word submission
 - **SummaryCard**: Game results display
+- **BrainprintChart**: Cognitive profile visualization (radar, bars, compact)
+- **LeaderboardTable**: Rankings table with tiers and medals
 
 ## Technology Stack
 
@@ -82,14 +84,13 @@ Each package has standard scripts:
 - [x] PHASE 2: Core engine (types, mode runners, orchestration)
 - [x] PHASE 3: Semantics engine (similarity, rarity, midpoint, cluster)
 - [x] PHASE 4: UI component library
-
 - [x] PHASE 5: All 12 game plugins complete
-- [x] PHASE 6: Platform features (database, brainprint, leaderboards) - Part 1
+- [x] PHASE 6: Platform features foundation - Part 1
+- [x] PHASE 6: API endpoints and profile pages - Part 2
 
 ### 🚧 In Progress
 
-- [ ] PHASE 6: Platform features (API endpoints, profile pages, seasons)
-- [ ] PHASE 7: Testing, database, deployment
+- [ ] PHASE 7: Testing and deployment
 
 ## Implemented Games (12 Total)
 
