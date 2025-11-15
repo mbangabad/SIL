@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "preserve",
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@sil/core": ["./packages/core/src"],
+      "@sil/games": ["./packages/games/src"],
+      "@sil/semantics": ["./packages/semantics/src"],
+      "@sil/ui": ["./packages/ui/src"]
+    }
+  },
+  "exclude": ["node_modules", "dist", ".next", "build"]
+}
