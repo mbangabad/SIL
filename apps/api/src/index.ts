@@ -2,6 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
+// Route imports
+import profileRoutes from './routes/profile';
+import leaderboardRoutes from './routes/leaderboards';
+import seasonRoutes from './routes/seasons';
+
 dotenv.config();
 
 const app = express();
@@ -15,6 +20,11 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });
+
+// Mount API routes
+app.use('/api/profile', profileRoutes);
+app.use('/api/leaderboards', leaderboardRoutes);
+app.use('/api/seasons', seasonRoutes);
 
 // Game initialization endpoint
 app.post('/api/initGame', async (req, res) => {
