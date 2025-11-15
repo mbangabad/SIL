@@ -83,11 +83,40 @@ Each package has standard scripts:
 - [x] PHASE 3: Semantics engine (similarity, rarity, midpoint, cluster)
 - [x] PHASE 4: UI component library
 
+- [x] PHASE 5: First 5 game plugins (GRIP, ZERO, PING, SPAN, CLUSTER)
+
 ### 🚧 In Progress
 
-- [ ] PHASE 5: Game plugins (12 games)
+- [ ] PHASE 5: Remaining 7 game plugins (COLORGLYPH, TRACE, FLOW, TENSOR, SPLICE, ONE, LOOP)
 - [ ] PHASE 6: Platform features (profile, leaderboards, seasons)
 - [ ] PHASE 7: Testing, database, deployment
+
+## Implemented Games
+
+### ✅ GRIP
+**Theme-based word selection** — Pick the word most similar to a hidden theme
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Precision, Semantic Inference, Intuition
+
+### ✅ ZERO
+**Rare word generation** — Find the rarest word matching a pattern
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Divergent Thinking, Vocabulary Depth, Pattern Recognition
+
+### ✅ PING
+**Rapid word filtering** — Quickly select words matching a category
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Executive Function, Filtering Under Pressure, Attention
+
+### ✅ SPAN
+**Semantic bridging** — Find the word that bridges two concepts
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Conceptual Blending, Creative Linking, Semantic Midpoint Detection
+
+### ✅ CLUSTER
+**Hot/cold navigation** — Navigate toward a hidden theme using heat feedback
+Modes: One-Shot, Journey, Arena, Endurance
+Skills: Theme Inference, Iterative Refinement, Strategic Thinking
 
 ## Game Plugin Architecture
 
