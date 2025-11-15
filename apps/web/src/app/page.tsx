@@ -12,10 +12,16 @@ export default function Home() {
             Semantic Intelligence League
           </h1>
           <p className="text-2xl text-slate-300 mb-12">
-            Word games powered by semantic AI. Test your cognitive skills across 12 unique games.
+            Word games powered by semantic AI. Test your cognitive skills across 25 unique games.
           </p>
 
           <div className="flex gap-4 justify-center mb-16">
+            <Link
+              href="/play"
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-lg transition-all text-lg shadow-lg hover:shadow-xl"
+            >
+              🎮 Play Now
+            </Link>
             <Link
               href="/profile/user1"
               className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors text-lg"
@@ -33,12 +39,12 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-slate-800/50 p-8 rounded-xl shadow-lg border border-slate-700">
               <div className="text-5xl mb-4">🎮</div>
-              <h2 className="text-3xl font-bold mb-3 text-white">12 Games</h2>
+              <h2 className="text-3xl font-bold mb-3 text-white">25 Games</h2>
               <p className="text-slate-300 mb-4">
-                From GRIP to LOOP, each game tests different semantic skills
+                12 original classics + 13 new semantic word games across 3 tiers
               </p>
               <div className="text-sm text-slate-400">
-                Theme matching • Rare words • Pattern recognition • And more...
+                Theme matching • Semantic gradients • Triangle coherence • And more...
               </div>
             </div>
 

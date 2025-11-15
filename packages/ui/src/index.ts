@@ -21,3 +21,4 @@ export * from './components/InputBox';
 export * from './components/SummaryCard';
 export * from './components/BrainprintChart';
 export * from './components/LeaderboardTable';
+export * from './components/Slider';

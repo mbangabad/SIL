@@ -4,6 +4,8 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmit": false,
     "paths": {
       "@sil/core": ["../../packages/core/src"],
       "@sil/games": ["../../packages/games/src"],
