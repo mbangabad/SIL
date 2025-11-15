@@ -17,10 +17,10 @@ export interface EmbeddingProvider {
 }
 
 /**
- * Mock embedding provider for development
- * Generates deterministic pseudo-embeddings for testing
+ * Mock embedding provider for development and testing
+ * Generates deterministic pseudo-embeddings
  *
- * TODO: Replace with actual embedding service (e.g., GloVe, Word2Vec, Sentence-BERT)
+ * For production, use FileEmbeddingProvider or SupabaseEmbeddingProvider
  */
 export class MockEmbeddingProvider implements EmbeddingProvider {
   private embeddingDim: number;

@@ -13,6 +13,7 @@
     "@sil/core": "workspace:*",
     "@sil/games": "workspace:*",
     "@sil/semantics": "workspace:*",
+    "@supabase/supabase-js": "^2.39.0",
     "express": "^4.19.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.0"

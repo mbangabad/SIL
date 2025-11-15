@@ -16,6 +16,10 @@ export * from './rarity';
 export * from './midpoint';
 export * from './cluster';
 
+// Export embedding providers
+export { FileEmbeddingProvider } from './providers/FileEmbeddingProvider';
+export { SupabaseEmbeddingProvider } from './providers/SupabaseEmbeddingProvider';
+
 // Re-export main functions for convenience
 export {
   embeddingService,
