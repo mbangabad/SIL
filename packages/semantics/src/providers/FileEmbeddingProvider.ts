@@ -8,7 +8,8 @@
 import { readFileSync } from 'fs';
 import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
-import type { WordEmbedding, EmbeddingProvider } from '../types';
+import type { WordEmbedding } from '../types';
+import type { EmbeddingProvider } from '../embeddings';
 
 export interface FileEmbeddingConfig {
   /** Path to embeddings file */

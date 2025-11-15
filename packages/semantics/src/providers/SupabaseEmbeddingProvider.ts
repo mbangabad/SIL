@@ -6,7 +6,8 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import type { WordEmbedding, EmbeddingProvider } from '../types';
+import type { WordEmbedding } from '../types';
+import type { EmbeddingProvider } from '../embeddings';
 
 export interface SupabaseEmbeddingConfig {
   supabaseUrl: string;

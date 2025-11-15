@@ -7,6 +7,7 @@
  * - Rarity scoring (frequency, patterns)
  * - Midpoint scoring (semantic bridging)
  * - Cluster analysis (theme proximity)
+ * - Advanced operations (interpolation, gradients, triangles)
  */
 
 export * from './types';
@@ -15,6 +16,7 @@ export * from './similarity';
 export * from './rarity';
 export * from './midpoint';
 export * from './cluster';
+export * from './advanced';
 
 // Export embedding providers
 export { FileEmbeddingProvider } from './providers/FileEmbeddingProvider';

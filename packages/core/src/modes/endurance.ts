@@ -109,7 +109,7 @@ export async function runEndurance(
   const summary: GameResultSummary = {
     score: averageScore,
     durationMs: Date.now() - startTime,
-    skillSignals: brainprint,
+    skillSignals: brainprint as Record<string, number>,
     metadata: {
       totalScore,
       gameCount: games.length,
@@ -173,4 +173,4 @@ export function supportsEndurance(games: GameDefinition[]): boolean {
   return games.every((game) => game.supportedModes.includes('endurance'));
 }
 
-export { BrainprintSignals as Brainprint };
+export type { BrainprintSignals as Brainprint };

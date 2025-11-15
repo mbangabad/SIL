@@ -58,7 +58,7 @@ export async function calculateClusterCenter(
 /**
  * Normalize a vector to unit length
  */
-function normalizeVector(vector: number[]): number[] {
+export function normalizeVector(vector: number[]): number[] {
   const magnitude = Math.sqrt(
     vector.reduce((sum, val) => sum + val * val, 0)
   );
