@@ -10,13 +10,23 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "test": "turbo run test",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "test:all": "turbo run test",
     "lint": "turbo run lint",
-    "clean": "turbo run clean"
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
   },
   "devDependencies": {
     "turbo": "^1.13.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vitest": "^1.0.4",
+    "@vitest/coverage-v8": "^1.0.4"
   },
   "engines": {
     "node": ">=18.0.0",
