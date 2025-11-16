@@ -12,3 +12,5 @@ export * from './types';
 export * from './modes';
 export * from './runner';
 export * from './telemetry';
+export * from './experiments';
+export * from './progression';
