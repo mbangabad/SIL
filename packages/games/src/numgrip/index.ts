@@ -43,16 +43,17 @@ export const numgripGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => {
       const x = Math.sin(s) * 10000;
       return x - Math.floor(x);
     };
 
     // Generate hidden target
-    const target = Math.round(random(ctx.seed) * 100);
+    const target = Math.round(random(baseSeed) * 100);
 
     // Generate candidates
-    const candidates = generateCandidates(target, 9, ctx.seed + 1);
+    const candidates = generateCandidates(target, 9, baseSeed + 1);
 
     const state: NumgripState = {
       target,
@@ -72,11 +73,11 @@ export const numgripGame: GameDefinition = {
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const numgripState = state.data as NumgripState;
 
-    if (action.type === 'select') {
-      const selectedNumber = typeof action.payload.word === 'string'
-        ? parseInt(action.payload.word, 10)
-        : action.payload.index !== undefined
-        ? numgripState.candidates[action.payload.index]
+    if (action.type === 'tap') {
+      const selectedNumber = typeof action.payload.wordId === 'string'
+        ? parseInt(action.payload.wordId, 10)
+        : parseInt(action.payload.wordId) !== undefined
+        ? numgripState.candidates[parseInt(action.payload.wordId)]
         : null;
 
       if (selectedNumber === null || isNaN(selectedNumber)) {
@@ -123,9 +124,9 @@ export const numgripGame: GameDefinition = {
   },
 
   uiSchema: {
-    primaryInput: 'grid',
-    layout: '3x3',
+    input: 'tap-one',
+    layout: 'grid',
     feedback: 'score-bar',
-    showScore: true,
+    
   },
 };

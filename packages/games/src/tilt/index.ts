@@ -16,10 +16,11 @@ export const tiltGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
     const numbers = [];
     for (let i = 0; i < 9; i++) {
-      numbers.push(10 + Math.floor(random(ctx.seed + i) * 80));
+      numbers.push(10 + Math.floor(random(baseSeed + i) * 80));
     }
     const sorted = [...numbers].sort((a, b) => a - b);
     const median = sorted[Math.floor(sorted.length / 2)];
@@ -33,8 +34,8 @@ export const tiltGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const tiltState = state.data as TiltState;
-    if (action.type === 'select') {
-      const selected = typeof action.payload.word === 'string' ? parseInt(action.payload.word, 10) : tiltState.numbers[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = typeof action.payload.wordId === 'string' ? parseInt(action.payload.wordId, 10) : tiltState.numbers[parseInt(action.payload.wordId)];
       const score = Math.max(0, 100 - Math.abs(selected - tiltState.median));
       return { ...state, done: true, data: { ...tiltState, selectedNumber: selected, score } };
     }
@@ -51,5 +52,5 @@ export const tiltGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '3x3', feedback: 'score-bar', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'score-bar' },
 };

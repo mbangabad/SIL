@@ -17,19 +17,20 @@ export const harmonyGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     // Generate reference pair
-    const refA = Math.floor(random(ctx.seed) * 8) + 2;
-    const refB = Math.floor(random(ctx.seed + 1) * 8) + 2;
+    const refA = Math.floor(random(baseSeed) * 8) + 2;
+    const refB = Math.floor(random(baseSeed + 1) * 8) + 2;
     const referenceRatio = refA / refB;
 
     // Generate 9 candidate pairs
     const candidates = [];
     for (let i = 0; i < 9; i++) {
-      const offset = (random(ctx.seed + i + 2) - 0.5) * 0.8;
+      const offset = (random(baseSeed + i + 2) - 0.5) * 0.8;
       const targetRatio = referenceRatio + offset;
-      const a = Math.floor(random(ctx.seed + i + 20) * 8) + 2;
+      const a = Math.floor(random(baseSeed + i + 20) * 8) + 2;
       const b = Math.round(a / targetRatio);
       const actualRatio = a / Math.max(1, b);
       candidates.push({ a, b: Math.max(1, b), ratio: actualRatio });
@@ -51,11 +52,11 @@ export const harmonyGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const harmonyState = state.data as HarmonyState;
-    if (action.type === 'select') {
-      const selected = harmonyState.candidates[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = harmonyState.candidates[parseInt(action.payload.wordId)];
       const distance = Math.abs(harmonyState.referenceRatio - selected.ratio);
       const score = Math.round(Math.max(0, 100 - distance * 50));
-      return { ...state, done: true, data: { ...harmonyState, selectedIndex: action.payload.index, score } };
+      return { ...state, done: true, data: { ...harmonyState, selectedIndex: parseInt(action.payload.wordId), score } };
     }
     return state;
   },
@@ -70,5 +71,5 @@ export const harmonyGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '3x3', feedback: 'score-bar', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'score-bar' },
 };

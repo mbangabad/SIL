@@ -20,22 +20,23 @@ export const fuseGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     // Generate two patterns (3 numbers each)
     const pattern1 = [];
     const pattern2 = [];
     for (let i = 0; i < 3; i++) {
-      pattern1.push(Math.floor(random(ctx.seed + i) * 20) + 10);
-      pattern2.push(Math.floor(random(ctx.seed + i + 10) * 20) + 10);
+      pattern1.push(Math.floor(random(baseSeed + i) * 20) + 10);
+      pattern2.push(Math.floor(random(baseSeed + i + 10) * 20) + 10);
     }
 
     // Choose fusion rule
     const rules: Array<'sum' | 'max' | 'min' | 'avg'> = ['sum', 'max', 'min', 'avg'];
-    const fusionRule = rules[Math.floor(random(ctx.seed + 20) * 4)];
+    const fusionRule = rules[Math.floor(random(baseSeed + 20) * 4)];
 
     // Apply fusion rule
-    const correctFusion = [];
+    const correctFusion: number[] = [];
     for (let i = 0; i < 3; i++) {
       if (fusionRule === 'sum') correctFusion.push(pattern1[i] + pattern2[i]);
       else if (fusionRule === 'max') correctFusion.push(Math.max(pattern1[i], pattern2[i]));
@@ -48,7 +49,7 @@ export const fuseGame: GameDefinition = {
     for (let i = 0; i < 3; i++) {
       const distractor = [];
       for (let j = 0; j < 3; j++) {
-        const offset = Math.floor((random(ctx.seed + 30 + i * 3 + j) - 0.5) * 20);
+        const offset = Math.floor((random(baseSeed + 30 + i * 3 + j) - 0.5) * 20);
         distractor.push(Math.max(1, correctFusion[j] + offset));
       }
       options.push(distractor);
@@ -56,7 +57,7 @@ export const fuseGame: GameDefinition = {
 
     // Shuffle options
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 50 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 50 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -84,9 +85,9 @@ export const fuseGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const fuseState = state.data as FuseState;
-    if (action.type === 'select') {
-      const score = action.payload.index === fuseState.correctIndex ? 100 : 0;
-      return { ...state, done: true, data: { ...fuseState, selectedIndex: action.payload.index, score } };
+    if (action.type === 'tap') {
+      const score = parseInt(action.payload.wordId) === fuseState.correctIndex ? 100 : 0;
+      return { ...state, done: true, data: { ...fuseState, selectedIndex: parseInt(action.payload.wordId), score } };
     }
     return state;
   },
@@ -101,5 +102,5 @@ export const fuseGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '2x2', feedback: 'hot-cold', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'hot-cold' },
 };

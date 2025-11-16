@@ -18,15 +18,16 @@ export const jumpGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     // Generate pattern type
-    const isAlternating = random(ctx.seed) > 0.5;
-    const delta1 = Math.floor((random(ctx.seed + 1) - 0.5) * 10) + 1;
-    const delta2 = isAlternating ? Math.floor((random(ctx.seed + 2) - 0.5) * 10) + 1 : undefined;
+    const isAlternating = random(baseSeed) > 0.5;
+    const delta1 = Math.floor((random(baseSeed + 1) - 0.5) * 10) + 1;
+    const delta2 = isAlternating ? Math.floor((random(baseSeed + 2) - 0.5) * 10) + 1 : undefined;
 
     // Generate sequence
-    const start = Math.floor(random(ctx.seed + 3) * 20) + 10;
+    const start = Math.floor(random(baseSeed + 3) * 20) + 10;
     const sequence: number[] = [start];
 
     if (isAlternating && delta2 !== undefined) {
@@ -45,13 +46,13 @@ export const jumpGame: GameDefinition = {
     // Generate options (correct + 3 distractors)
     const options = [correctNext];
     for (let i = 0; i < 3; i++) {
-      const offset = Math.floor((random(ctx.seed + 10 + i) - 0.5) * 20);
+      const offset = Math.floor((random(baseSeed + 10 + i) - 0.5) * 20);
       options.push(correctNext + offset);
     }
 
     // Shuffle options
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 20 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 20 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -72,10 +73,10 @@ export const jumpGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const jumpState = state.data as JumpState;
-    if (action.type === 'select') {
-      const selected = jumpState.options[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = jumpState.options[parseInt(action.payload.wordId)];
       const score = selected === jumpState.correctNext ? 100 : 0;
-      return { ...state, done: true, data: { ...jumpState, selectedIndex: action.payload.index, score } };
+      return { ...state, done: true, data: { ...jumpState, selectedIndex: parseInt(action.payload.wordId), score } };
     }
     return state;
   },
@@ -90,5 +91,5 @@ export const jumpGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '2x2', feedback: 'hot-cold', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'hot-cold' },
 };

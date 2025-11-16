@@ -22,15 +22,16 @@ export const midpointGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
-    const numberA = Math.floor(random(ctx.seed) * 50) + 10;
-    const numberB = Math.floor(random(ctx.seed + 1) * 50) + 60;
+    const numberA = Math.floor(random(baseSeed) * 50) + 10;
+    const numberB = Math.floor(random(baseSeed + 1) * 50) + 60;
     const midpoint = Math.round((numberA + numberB) / 2);
 
     const candidates = [];
     for (let i = 0; i < 9; i++) {
-      const offset = (random(ctx.seed + i + 2) - 0.5) * 30;
+      const offset = (random(baseSeed + i + 2) - 0.5) * 30;
       candidates.push(Math.round(midpoint + offset));
     }
 
@@ -51,10 +52,10 @@ export const midpointGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const midState = state.data as MidpointState;
-    if (action.type === 'select') {
-      const selected = typeof action.payload.word === 'string'
-        ? parseInt(action.payload.word, 10)
-        : midState.candidates[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = typeof action.payload.wordId === 'string'
+        ? parseInt(action.payload.wordId, 10)
+        : midState.candidates[parseInt(action.payload.wordId)];
 
       const distance = Math.abs(selected - midState.midpoint);
       const score = Math.max(0, 100 - distance);
@@ -78,5 +79,5 @@ export const midpointGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '3x3', feedback: 'score-bar', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'score-bar' },
 };

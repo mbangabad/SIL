@@ -21,9 +21,10 @@ export const rotorGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
-    const targetRotation = Math.floor(random(ctx.seed) * 4) * 90;
+    const targetRotation = Math.floor(random(baseSeed) * 4) * 90;
 
     const options = [
       { id: 'opt-0', rotation: targetRotation },
@@ -33,7 +34,7 @@ export const rotorGame: GameDefinition = {
     ];
 
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 10 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 10 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -55,8 +56,8 @@ export const rotorGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const rotorState = state.data as RotorState;
-    if (action.type === 'select') {
-      const selectedIndex = action.payload.index ?? 0;
+    if (action.type === 'tap') {
+      const selectedIndex = parseInt(action.payload.wordId) ?? 0;
       const score = selectedIndex === rotorState.correctIndex ? 100 : 0;
       return { ...state, done: true, data: { ...rotorState, selectedIndex, score } };
     }
@@ -77,5 +78,5 @@ export const rotorGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '2x2', feedback: 'hot-cold', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'hot-cold' },
 };

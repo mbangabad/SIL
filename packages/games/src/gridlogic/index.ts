@@ -86,7 +86,8 @@ export const gridlogicGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
-    const { grid, missing, answer } = generatePatternGrid(ctx.seed);
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
+    const { grid, missing, answer } = generatePatternGrid(baseSeed);
 
     // Generate options (correct + 3 distractors)
     const shapes: GridCell[] = ['circle', 'square', 'triangle', 'star'];
@@ -101,7 +102,7 @@ export const gridlogicGame: GameDefinition = {
       return x - Math.floor(x);
     };
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 10 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 10 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -125,8 +126,8 @@ export const gridlogicGame: GameDefinition = {
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const gridState = state.data as GridLogicState;
 
-    if (action.type === 'select') {
-      const selected = action.payload.word as GridCell;
+    if (action.type === 'tap') {
+      const selected = action.payload.wordId as GridCell;
       const isCorrect = selected === gridState.correctAnswer;
       const score = isCorrect ? 100 : 0;
 
@@ -164,9 +165,9 @@ export const gridlogicGame: GameDefinition = {
   },
 
   uiSchema: {
-    primaryInput: 'grid',
-    layout: '3x3',
+    input: 'tap-one',
+    layout: 'grid',
     feedback: 'percentile',
-    showScore: true,
+    
   },
 };

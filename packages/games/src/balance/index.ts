@@ -18,18 +18,19 @@ export const balanceGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     const shapes = ['circle', 'square', 'triangle', 'star'];
     const weights = { circle: 1, square: 2, triangle: 3, star: 4 };
 
     // Generate left side (2-3 shapes)
-    const leftCount = Math.floor(random(ctx.seed) * 2) + 2;
+    const leftCount = Math.floor(random(baseSeed) * 2) + 2;
     const leftShapes = [];
     let totalLeftWeight = 0;
 
     for (let i = 0; i < leftCount; i++) {
-      const shape = shapes[Math.floor(random(ctx.seed + i + 1) * shapes.length)];
+      const shape = shapes[Math.floor(random(baseSeed + i + 1) * shapes.length)];
       const weight = weights[shape as keyof typeof weights];
       leftShapes.push({ shape, weight });
       totalLeftWeight += weight;
@@ -37,7 +38,7 @@ export const balanceGame: GameDefinition = {
 
     // Generate options (correct answer + 3 distractors)
     const options = [];
-    const correctShape = shapes[Math.floor(random(ctx.seed + 10) * shapes.length)];
+    const correctShape = shapes[Math.floor(random(baseSeed + 10) * shapes.length)];
     const correctWeight = weights[correctShape as keyof typeof weights];
     const correctCount = Math.ceil(totalLeftWeight / correctWeight);
 
@@ -45,16 +46,16 @@ export const balanceGame: GameDefinition = {
 
     // Add distractors
     for (let i = 0; i < 3; i++) {
-      const shape = shapes[Math.floor(random(ctx.seed + 20 + i) * shapes.length)];
+      const shape = shapes[Math.floor(random(baseSeed + 20 + i) * shapes.length)];
       const weight = weights[shape as keyof typeof weights];
-      const count = Math.floor(random(ctx.seed + 30 + i) * 4) + 1;
+      const count = Math.floor(random(baseSeed + 30 + i) * 4) + 1;
       options.push({ shape, count, weight: count * weight });
     }
 
     // Shuffle options
     const correctIndex = 0;
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 40 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 40 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -77,9 +78,9 @@ export const balanceGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const balanceState = state.data as BalanceState;
-    if (action.type === 'select') {
-      const score = action.payload.index === balanceState.correctIndex ? 100 : 0;
-      return { ...state, done: true, data: { ...balanceState, selectedIndex: action.payload.index, score } };
+    if (action.type === 'tap') {
+      const score = parseInt(action.payload.wordId) === balanceState.correctIndex ? 100 : 0;
+      return { ...state, done: true, data: { ...balanceState, selectedIndex: parseInt(action.payload.wordId), score } };
     }
     return state;
   },
@@ -94,5 +95,5 @@ export const balanceGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '2x2', feedback: 'hot-cold', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'hot-cold' },
 };

@@ -18,15 +18,16 @@ export const pairGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     // Choose rule type
     const ruleTypes: Array<'sum' | 'product' | 'difference' | 'ratio'> = ['sum', 'product', 'difference', 'ratio'];
-    const ruleType = ruleTypes[Math.floor(random(ctx.seed) * 4)];
+    const ruleType = ruleTypes[Math.floor(random(baseSeed) * 4)];
 
     // Generate reference pair
-    const refA = Math.floor(random(ctx.seed + 1) * 8) + 2;
-    const refB = Math.floor(random(ctx.seed + 2) * 8) + 2;
+    const refA = Math.floor(random(baseSeed + 1) * 8) + 2;
+    const refB = Math.floor(random(baseSeed + 2) * 8) + 2;
 
     const calculateRuleValue = (a: number, b: number, type: typeof ruleType): number => {
       if (type === 'sum') return a + b;
@@ -41,7 +42,7 @@ export const pairGame: GameDefinition = {
     const candidates = [];
 
     // Correct candidate
-    const correctA = Math.floor(random(ctx.seed + 10) * 8) + 2;
+    const correctA = Math.floor(random(baseSeed + 10) * 8) + 2;
     let correctB: number;
     if (ruleType === 'sum') correctB = ruleValue - correctA;
     else if (ruleType === 'product') correctB = Math.round(ruleValue / correctA);
@@ -53,15 +54,15 @@ export const pairGame: GameDefinition = {
 
     // Incorrect candidates
     for (let i = 0; i < 8; i++) {
-      const a = Math.floor(random(ctx.seed + 20 + i) * 8) + 2;
-      const b = Math.floor(random(ctx.seed + 30 + i) * 8) + 2;
+      const a = Math.floor(random(baseSeed + 20 + i) * 8) + 2;
+      const b = Math.floor(random(baseSeed + 30 + i) * 8) + 2;
       candidates.push({ a, b, ruleValue: calculateRuleValue(a, b, ruleType) });
     }
 
     // Shuffle candidates
     const correctIndex = 0;
     for (let i = candidates.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 40 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 40 + i) * (i + 1));
       [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
     }
 
@@ -84,13 +85,13 @@ export const pairGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const pairState = state.data as PairState;
-    if (action.type === 'select') {
-      const selected = pairState.candidates[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = pairState.candidates[parseInt(action.payload.wordId)];
       const distance = Math.abs(pairState.rule.value - selected.ruleValue);
       const allDistances = pairState.candidates.map(c => Math.abs(pairState.rule.value - c.ruleValue));
       const maxDistance = Math.max(...allDistances);
       const score = maxDistance > 0 ? Math.round(Math.max(0, 100 - (distance / maxDistance) * 100)) : 100;
-      return { ...state, done: true, data: { ...pairState, selectedIndex: action.payload.index, score } };
+      return { ...state, done: true, data: { ...pairState, selectedIndex: parseInt(action.payload.wordId), score } };
     }
     return state;
   },
@@ -105,5 +106,5 @@ export const pairGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '3x3', feedback: 'score-bar', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'score-bar' },
 };

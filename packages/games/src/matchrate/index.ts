@@ -16,11 +16,12 @@ export const matchrateGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
-    const hiddenSlope = 0.2 + random(ctx.seed) * 0.6;
+    const hiddenSlope = 0.2 + random(baseSeed) * 0.6;
     const options = [];
     for (let i = 0; i < 4; i++) {
-      const slope = 0.1 + random(ctx.seed + i + 1) * 0.8;
+      const slope = 0.1 + random(baseSeed + i + 1) * 0.8;
       options.push({ value: 10 + i * 5, slope });
     }
 
@@ -33,8 +34,8 @@ export const matchrateGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const matchState = state.data as MatchrateState;
-    if (action.type === 'select') {
-      const selected = matchState.options[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = matchState.options[parseInt(action.payload.wordId)];
       const score = Math.round(Math.max(0, 100 - Math.abs(matchState.hiddenSlope - selected.slope) * 100));
       return { ...state, done: true, data: { ...matchState, selectedValue: selected.value, score } };
     }
@@ -51,5 +52,5 @@ export const matchrateGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: 'list', feedback: 'score-bar', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'list', feedback: 'score-bar' },
 };

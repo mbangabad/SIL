@@ -61,17 +61,18 @@ export const alignGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     // Generate hidden center
     const random = (s: number) => {
       const x = Math.sin(s) * 10000;
       return x - Math.floor(x);
     };
 
-    const hiddenX = 0.3 + random(ctx.seed) * 0.4; // Keep center away from edges
-    const hiddenY = 0.3 + random(ctx.seed + 1) * 0.4;
+    const hiddenX = 0.3 + random(baseSeed) * 0.4; // Keep center away from edges
+    const hiddenY = 0.3 + random(baseSeed + 1) * 0.4;
 
     // Generate points
-    const points = generatePoints(hiddenX, hiddenY, 9, ctx.seed + 2);
+    const points = generatePoints(hiddenX, hiddenY, 9, baseSeed + 2);
 
     const state: AlignState = {
       points,
@@ -91,8 +92,8 @@ export const alignGame: GameDefinition = {
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const alignState = state.data as AlignState;
 
-    if (action.type === 'select') {
-      const pointId = action.payload.word || action.payload.id;
+    if (action.type === 'tap') {
+      const pointId = action.payload.wordId;
       const selectedPoint = alignState.points.find(p => p.id === pointId);
 
       if (!selectedPoint) {
@@ -142,9 +143,9 @@ export const alignGame: GameDefinition = {
   },
 
   uiSchema: {
-    primaryInput: 'grid',
-    layout: '3x3',
+    input: 'tap-one',
+    layout: 'grid',
     feedback: 'hot-cold',
-    showScore: true,
+    
   },
 };

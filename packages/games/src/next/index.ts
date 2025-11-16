@@ -23,23 +23,24 @@ export const nextGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     const ruleTypes: Array<'add' | 'multiply' | 'quadratic'> = ['add', 'multiply', 'quadratic'];
-    const ruleType = ruleTypes[Math.floor(random(ctx.seed) * ruleTypes.length)];
+    const ruleType = ruleTypes[Math.floor(random(baseSeed) * ruleTypes.length)];
 
     let sequence: number[];
     let correctNext: number;
     let ruleValue: number;
 
     if (ruleType === 'add') {
-      ruleValue = 2 + Math.floor(random(ctx.seed + 1) * 4); // +2 to +5
-      const start = 1 + Math.floor(random(ctx.seed + 2) * 10);
+      ruleValue = 2 + Math.floor(random(baseSeed + 1) * 4); // +2 to +5
+      const start = 1 + Math.floor(random(baseSeed + 2) * 10);
       sequence = [start, start + ruleValue, start + 2 * ruleValue];
       correctNext = start + 3 * ruleValue;
     } else if (ruleType === 'multiply') {
       ruleValue = 2;
-      const start = 1 + Math.floor(random(ctx.seed + 2) * 3);
+      const start = 1 + Math.floor(random(baseSeed + 2) * 3);
       sequence = [start, start * 2, start * 4];
       correctNext = start * 8;
     } else {
@@ -56,7 +57,7 @@ export const nextGame: GameDefinition = {
     ];
 
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 10 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 10 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -78,10 +79,10 @@ export const nextGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const nextState = state.data as NextState;
-    if (action.type === 'select') {
-      const selected = typeof action.payload.word === 'string'
-        ? parseInt(action.payload.word, 10)
-        : nextState.options[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = typeof action.payload.wordId === 'string'
+        ? parseInt(action.payload.wordId, 10)
+        : nextState.options[parseInt(action.payload.wordId)];
 
       const score = selected === nextState.correctNext ? 100 : 0;
       return { ...state, done: true, data: { ...nextState, selectedNumber: selected, score } };
@@ -102,5 +103,5 @@ export const nextGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: 'list', feedback: 'percentile', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'list', feedback: 'percentile' },
 };

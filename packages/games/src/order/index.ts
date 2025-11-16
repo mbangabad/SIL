@@ -16,12 +16,13 @@ export const orderGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     // Generate 9 random numbers
     const numbers = [];
     for (let i = 0; i < 9; i++) {
-      numbers.push(10 + Math.floor(random(ctx.seed + i) * 80));
+      numbers.push(10 + Math.floor(random(baseSeed + i) * 80));
     }
 
     const correctOrder = [...numbers].sort((a, b) => a - b);
@@ -42,8 +43,8 @@ export const orderGame: GameDefinition = {
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const orderState = state.data as OrderState;
 
-    if (action.type === 'select') {
-      const tapped = orderState.numbers[action.payload.index];
+    if (action.type === 'tap') {
+      const tapped = orderState.numbers[parseInt(action.payload.wordId)];
       const newSequence = [...orderState.tappedSequence, tapped];
 
       // Check if sequence is complete
@@ -75,5 +76,5 @@ export const orderGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'tap-sequence', layout: '3x3', feedback: 'progressive', showScore: true },
+  uiSchema: { input: 'tap-many', layout: 'grid', feedback: 'score-bar' },
 };

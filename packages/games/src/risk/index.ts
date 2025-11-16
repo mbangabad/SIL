@@ -16,15 +16,16 @@ export const riskGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
     const risks: Array<'low' | 'med' | 'high'> = ['low', 'med', 'high'];
-    const hiddenRisk = risks[Math.floor(random(ctx.seed) * 3)];
+    const hiddenRisk = risks[Math.floor(random(baseSeed) * 3)];
     const targetVol = hiddenRisk === 'low' ? 0.2 : hiddenRisk === 'med' ? 0.5 : 0.8;
 
     const candidates = [];
     for (let i = 0; i < 9; i++) {
-      const value = 10 + Math.floor(random(ctx.seed + i + 1) * 80);
-      const volatility = random(ctx.seed + i + 10);
+      const value = 10 + Math.floor(random(baseSeed + i + 1) * 80);
+      const volatility = random(baseSeed + i + 10);
       candidates.push({ value, volatility });
     }
 
@@ -37,8 +38,8 @@ export const riskGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const riskState = state.data as RiskState;
-    if (action.type === 'select') {
-      const selected = riskState.candidates[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = riskState.candidates[parseInt(action.payload.wordId)];
       const targetVol = riskState.hiddenRisk === 'low' ? 0.2 : riskState.hiddenRisk === 'med' ? 0.5 : 0.8;
       const score = Math.round(Math.max(0, 100 - Math.abs(targetVol - selected.volatility) * 100));
       return { ...state, done: true, data: { ...riskState, selectedValue: selected.value, score } };
@@ -56,5 +57,5 @@ export const riskGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '3x3', feedback: 'score-bar', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'score-bar' },
 };

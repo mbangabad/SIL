@@ -19,12 +19,13 @@ export const growthGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     // Choose growth function type
     const types: Array<'linear' | 'exponential' | 'quadratic'> = ['linear', 'exponential', 'quadratic'];
-    const growthType = types[Math.floor(random(ctx.seed) * 3)];
-    const param = 1 + Math.floor(random(ctx.seed + 1) * 4); // 1-4
+    const growthType = types[Math.floor(random(baseSeed) * 3)];
+    const param = 1 + Math.floor(random(baseSeed + 1) * 4); // 1-4
 
     const applyGrowth = (x: number): number => {
       if (growthType === 'linear') return x * param;
@@ -47,13 +48,13 @@ export const growthGame: GameDefinition = {
     // Generate options (correct + 3 distractors)
     const options = [correctOutput];
     for (let i = 0; i < 3; i++) {
-      const offset = Math.floor((random(ctx.seed + 10 + i) - 0.5) * correctOutput);
+      const offset = Math.floor((random(baseSeed + 10 + i) - 0.5) * correctOutput);
       options.push(Math.max(1, correctOutput + offset));
     }
 
     // Shuffle options
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 20 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 20 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -75,12 +76,12 @@ export const growthGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const growthState = state.data as GrowthState;
-    if (action.type === 'select') {
-      const selected = growthState.options[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = growthState.options[parseInt(action.payload.wordId)];
       const distance = Math.abs(selected - growthState.correctOutput);
       const maxDistance = Math.max(...growthState.options.map(o => Math.abs(o - growthState.correctOutput)));
       const score = maxDistance > 0 ? Math.round(Math.max(0, 100 - (distance / maxDistance) * 100)) : 100;
-      return { ...state, done: true, data: { ...growthState, selectedIndex: action.payload.index, score } };
+      return { ...state, done: true, data: { ...growthState, selectedIndex: parseInt(action.payload.wordId), score } };
     }
     return state;
   },
@@ -95,5 +96,5 @@ export const growthGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '2x2', feedback: 'hot-cold', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'hot-cold' },
 };

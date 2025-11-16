@@ -16,15 +16,16 @@ export const packGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     // Hidden capacity
-    const capacity = 40 + Math.floor(random(ctx.seed) * 40);
+    const capacity = 40 + Math.floor(random(baseSeed) * 40);
 
     // Generate 9 candidate numbers
     const numbers = [];
     for (let i = 0; i < 9; i++) {
-      const offset = (random(ctx.seed + i + 1) - 0.5) * 60;
+      const offset = (random(baseSeed + i + 1) - 0.5) * 60;
       numbers.push(Math.max(10, Math.round(capacity + offset)));
     }
 
@@ -43,8 +44,8 @@ export const packGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const packState = state.data as PackState;
-    if (action.type === 'select') {
-      const selected = packState.numbers[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = packState.numbers[parseInt(action.payload.wordId)];
       const distance = Math.abs(selected - packState.capacity);
       const score = Math.round(Math.max(0, 100 - distance));
       return { ...state, done: true, data: { ...packState, selectedNumber: selected, score } };
@@ -62,5 +63,5 @@ export const packGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '3x3', feedback: 'hot-cold', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'hot-cold' },
 };

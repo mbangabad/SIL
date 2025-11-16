@@ -17,17 +17,18 @@ export const choiceGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     // Hidden scoring function weights
-    const costWeight = 0.3 + random(ctx.seed) * 0.4; // 0.3 to 0.7
+    const costWeight = 0.3 + random(baseSeed) * 0.4; // 0.3 to 0.7
     const benefitWeight = 1 - costWeight;
 
     // Generate 4 options with cost and benefit
     const options = [];
     for (let i = 0; i < 4; i++) {
-      const cost = 10 + Math.floor(random(ctx.seed + i + 1) * 80);
-      const benefit = 10 + Math.floor(random(ctx.seed + i + 10) * 80);
+      const cost = 10 + Math.floor(random(baseSeed + i + 1) * 80);
+      const benefit = 10 + Math.floor(random(baseSeed + i + 10) * 80);
       const payoff = benefitWeight * benefit - costWeight * cost;
       options.push({ cost, benefit, payoff });
     }
@@ -58,13 +59,13 @@ export const choiceGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const choiceState = state.data as ChoiceState;
-    if (action.type === 'select') {
-      const selectedPayoff = choiceState.options[action.payload.index].payoff;
+    if (action.type === 'tap') {
+      const selectedPayoff = choiceState.options[parseInt(action.payload.wordId)].payoff;
       const optimalPayoff = choiceState.options[choiceState.optimalIndex].payoff;
       const payoffRange = Math.max(...choiceState.options.map(o => o.payoff)) - Math.min(...choiceState.options.map(o => o.payoff));
       const distance = Math.abs(optimalPayoff - selectedPayoff);
       const score = payoffRange > 0 ? Math.round(Math.max(0, 100 - (distance / payoffRange) * 100)) : 100;
-      return { ...state, done: true, data: { ...choiceState, selectedIndex: action.payload.index, score } };
+      return { ...state, done: true, data: { ...choiceState, selectedIndex: parseInt(action.payload.wordId), score } };
     }
     return state;
   },
@@ -79,5 +80,5 @@ export const choiceGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '2x2', feedback: 'score-bar', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'score-bar' },
 };

@@ -17,11 +17,12 @@ export const flipGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
     const shapes = ['arrow', 'L-shape', 'triangle', 'asymmetric'];
-    const shape = shapes[Math.floor(random(ctx.seed) * shapes.length)];
-    const flipType = random(ctx.seed + 1) > 0.5 ? 'H' : 'V';
-    const correctIndex = Math.floor(random(ctx.seed + 2) * 4);
+    const shape = shapes[Math.floor(random(baseSeed) * shapes.length)];
+    const flipType = random(baseSeed + 1) > 0.5 ? 'H' : 'V';
+    const correctIndex = Math.floor(random(baseSeed + 2) * 4);
 
     return {
       step: 0,
@@ -32,9 +33,9 @@ export const flipGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const flipState = state.data as FlipState;
-    if (action.type === 'select') {
-      const score = action.payload.index === flipState.correctIndex ? 100 : 0;
-      return { ...state, done: true, data: { ...flipState, selectedIndex: action.payload.index, score } };
+    if (action.type === 'tap') {
+      const score = parseInt(action.payload.wordId) === flipState.correctIndex ? 100 : 0;
+      return { ...state, done: true, data: { ...flipState, selectedIndex: parseInt(action.payload.wordId), score } };
     }
     return state;
   },
@@ -49,5 +50,5 @@ export const flipGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: '2x2', feedback: 'hot-cold', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'grid', feedback: 'hot-cold' },
 };

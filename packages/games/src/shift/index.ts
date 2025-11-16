@@ -63,6 +63,7 @@ export const shiftGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => {
       const x = Math.sin(s) * 10000;
       return x - Math.floor(x);
@@ -73,22 +74,22 @@ export const shiftGame: GameDefinition = {
 
     // Create shape A
     const shapeA: ShapeConfig = {
-      type: shapes[Math.floor(random(ctx.seed) * shapes.length)],
+      type: shapes[Math.floor(random(baseSeed) * shapes.length)],
       rotation: 0,
       scale: 1,
       flipped: false,
     };
 
     // Select transformation
-    const transformation = transforms[Math.floor(random(ctx.seed + 1) * transforms.length)];
+    const transformation = transforms[Math.floor(random(baseSeed + 1) * transforms.length)];
 
     // Apply transformation to get shape B
     const shapeB = applyTransformation(shapeA, transformation);
 
     // Create shape C (different base shape)
     const shapeC: ShapeConfig = {
-      type: shapes[Math.floor(random(ctx.seed + 2) * shapes.length)],
-      rotation: Math.floor(random(ctx.seed + 3) * 4) * 90,
+      type: shapes[Math.floor(random(baseSeed + 2) * shapes.length)],
+      rotation: Math.floor(random(baseSeed + 3) * 4) * 90,
       scale: 1,
       flipped: false,
     };
@@ -107,7 +108,7 @@ export const shiftGame: GameDefinition = {
 
     // Shuffle options
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 10 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 10 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -134,8 +135,8 @@ export const shiftGame: GameDefinition = {
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const shiftState = state.data as ShiftState;
 
-    if (action.type === 'select') {
-      const selectedIndex = action.payload.index;
+    if (action.type === 'tap') {
+      const selectedIndex = parseInt(action.payload.wordId);
 
       // Find correct index
       const correctD = applyTransformation(shiftState.shapeC, shiftState.transformation);
@@ -181,9 +182,9 @@ export const shiftGame: GameDefinition = {
   },
 
   uiSchema: {
-    primaryInput: 'grid',
-    layout: '2x2',
+    input: 'tap-one',
+    layout: 'grid',
     feedback: 'hot-cold',
-    showScore: true,
+    
   },
 };

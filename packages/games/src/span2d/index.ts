@@ -55,18 +55,19 @@ export const span2dGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => {
       const x = Math.sin(s) * 10000;
       return x - Math.floor(x);
     };
 
     const target: Point2D = {
-      x: 0.2 + random(ctx.seed) * 0.6,
-      y: 0.2 + random(ctx.seed + 1) * 0.6,
+      x: 0.2 + random(baseSeed) * 0.6,
+      y: 0.2 + random(baseSeed + 1) * 0.6,
       id: 'target',
     };
 
-    const points = generateScatteredPoints(target, 9, ctx.seed + 2);
+    const points = generateScatteredPoints(target, 9, baseSeed + 2);
 
     const state: Span2DState = {
       target,
@@ -86,8 +87,8 @@ export const span2dGame: GameDefinition = {
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const span2dState = state.data as Span2DState;
 
-    if (action.type === 'select') {
-      const pointId = action.payload.word || action.payload.id;
+    if (action.type === 'tap') {
+      const pointId = action.payload.wordId;
       const selectedPoint = span2dState.points.find(p => p.id === pointId);
 
       if (!selectedPoint) {
@@ -131,9 +132,9 @@ export const span2dGame: GameDefinition = {
   },
 
   uiSchema: {
-    primaryInput: 'grid',
-    layout: '3x3',
+    input: 'tap-one',
+    layout: 'grid',
     feedback: 'hot-cold',
-    showScore: true,
+    
   },
 };

@@ -35,11 +35,12 @@ export const inverseGame: GameDefinition = {
   supportedModes: ['oneShot', 'journey', 'arena', 'endurance'],
 
   async init(ctx: GameContext): Promise<GameState> {
+    const baseSeed = parseInt(ctx.seed, 10) || 0;
     const random = (s: number) => Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000);
 
     const functionTypes: Array<'add' | 'multiply' | 'composite'> = ['add', 'multiply', 'composite'];
-    const fnType = functionTypes[Math.floor(random(ctx.seed) * functionTypes.length)];
-    const fnValue = fnType === 'multiply' ? 2 : 3 + Math.floor(random(ctx.seed + 1) * 5);
+    const fnType = functionTypes[Math.floor(random(baseSeed) * functionTypes.length)];
+    const fnValue = fnType === 'multiply' ? 2 : 3 + Math.floor(random(baseSeed + 1) * 5);
 
     const fn = { type: fnType, value: fnValue };
 
@@ -59,7 +60,7 @@ export const inverseGame: GameDefinition = {
     ];
 
     for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(random(ctx.seed + 10 + i) * (i + 1));
+      const j = Math.floor(random(baseSeed + 10 + i) * (i + 1));
       [options[i], options[j]] = [options[j], options[i]];
     }
 
@@ -81,10 +82,10 @@ export const inverseGame: GameDefinition = {
 
   update(ctx: GameContext, state: GameState, action: PlayerAction): GameState {
     const invState = state.data as InverseState;
-    if (action.type === 'select') {
-      const selected = typeof action.payload.word === 'string'
-        ? parseInt(action.payload.word, 10)
-        : invState.options[action.payload.index];
+    if (action.type === 'tap') {
+      const selected = typeof action.payload.wordId === 'string'
+        ? parseInt(action.payload.wordId, 10)
+        : invState.options[parseInt(action.payload.wordId)];
 
       const score = selected === invState.correctInput ? 100 : 0;
       return { ...state, done: true, data: { ...invState, selectedNumber: selected, score } };
@@ -107,5 +108,5 @@ export const inverseGame: GameDefinition = {
     };
   },
 
-  uiSchema: { primaryInput: 'grid', layout: 'list', feedback: 'percentile', showScore: true },
+  uiSchema: { input: 'tap-one', layout: 'list', feedback: 'percentile' },
 };
