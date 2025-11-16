@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ALL_GAMES } from '@sil/games';
+import { EmailCapture } from '@/components/EmailCapture';
 
 export default function Home() {
   // Organize games by category
@@ -252,6 +253,13 @@ export default function Home() {
               spatial intelligence, and pattern recognition.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Email Capture */}
+      <div className="py-24 px-6 md:px-12">
+        <div className="max-w-2xl mx-auto">
+          <EmailCapture />
         </div>
       </div>
     </main>
