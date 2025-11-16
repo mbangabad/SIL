@@ -2,12 +2,12 @@
  * GameRenderer Component
  *
  * Dynamically renders the appropriate UI for any SIL game
- * Maps game state to UI components based on game type and uiSchema
+ * Maps game state to UI components based on uiSchema (schema-driven, no hardcoded game IDs)
  */
 
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { GameDefinition, GameState, PlayerAction } from '@sil/core';
 import {
   WordCard,
@@ -27,6 +27,7 @@ export interface GameRendererProps {
 
 /**
  * Renders a game based on its UI schema
+ * SCHEMA-DRIVEN: Uses uiSchema.input and uiSchema.layout, NOT game.id
  *
  * @example
  * ```tsx
@@ -46,51 +47,56 @@ export const GameRenderer: React.FC<GameRendererProps> = ({
   const { uiSchema } = game;
   const gameData = gameState.data as any;
 
-  // Handle word selection
+  // Handle word/option selection (tap-one input type)
+  // Uses official PlayerAction type: { type: 'tap', payload: { wordId: string } }
   const handleWordClick = (word: string, index: number) => {
     if (disabled || gameState.done) return;
 
     onAction({
-      type: 'select',
-      payload: { word, index },
-      timestamp: Date.now(),
+      type: 'tap',
+      payload: { wordId: String(index) },
     });
   };
 
-  // Handle text input
+  // Handle text input submission
+  // Uses official PlayerAction type: { type: 'submitWord', payload: { text: string } }
   const handleTextSubmit = (text: string) => {
     if (disabled || gameState.done) return;
 
+    // Input validation
+    const trimmed = text.trim();
+    if (!trimmed || trimmed.length > 50) {
+      console.warn('Invalid input: empty or too long');
+      return;
+    }
+
     onAction({
-      type: 'submit',
-      payload: { word: text },
-      timestamp: Date.now(),
+      type: 'submitWord',
+      payload: { text: trimmed },
     });
   };
 
-  // Handle slider change for VECTOR game
+  // Handle slider interaction (custom type for special games like VECTOR)
   const handleSliderChange = (value: number) => {
     if (disabled || gameState.done) return;
 
     onAction({
       type: 'custom',
       payload: { type: 'slider', value },
-      timestamp: Date.now(),
     });
   };
 
-  // Handle slider submit for VECTOR game
+  // Handle slider submit
   const handleSliderSubmit = () => {
     if (disabled || gameState.done) return;
 
     onAction({
       type: 'custom',
       payload: { type: 'submit' },
-      timestamp: Date.now(),
     });
   };
 
-  // Render word grid (for games like GRIP, ZERO, PING, etc.)
+  // Render word grid (for tap-one/tap-many input types)
   const renderWordGrid = () => {
     const words = gameData.words || gameData.options || [];
     const selectedIndex = gameData.selectedIndex ?? gameData.selectedWordIndex ?? null;
@@ -98,7 +104,7 @@ export const GameRenderer: React.FC<GameRendererProps> = ({
     if (!words.length) return null;
 
     return (
-      <WordGrid layout={uiSchema.layout || '3x3'}>
+      <WordGrid layout={uiSchema.layout || 'grid'}>
         {words.map((word: string, index: number) => (
           <WordCard
             key={index}
@@ -112,13 +118,14 @@ export const GameRenderer: React.FC<GameRendererProps> = ({
             }
             onClick={() => handleWordClick(word, index)}
             disabled={disabled || gameState.done}
+            aria-label={`Select option ${index + 1}: ${word}`}
           />
         ))}
       </WordGrid>
     );
   };
 
-  // Render text input (for games like FLOW, SPLICE)
+  // Render text input (for type-one-word input type)
   const renderTextInput = () => {
     return (
       <InputBox
@@ -126,11 +133,12 @@ export const GameRenderer: React.FC<GameRendererProps> = ({
         onSubmit={handleTextSubmit}
         disabled={disabled || gameState.done}
         maxLength={50}
+        aria-label="Text input for word submission"
       />
     );
   };
 
-  // Render slider (for VECTOR game)
+  // Render slider (for dual-anchor layout)
   const renderSlider = () => {
     const position = gameData.userPosition ?? 0.5;
     const anchorA = gameData.anchorA || '';
@@ -145,12 +153,14 @@ export const GameRenderer: React.FC<GameRendererProps> = ({
           rightLabel={anchorB}
           showPercentage
           disabled={disabled || gameState.done}
+          aria-label={`Slider between ${anchorA} and ${anchorB}`}
         />
         {!gameState.done && (
           <button
             onClick={handleSliderSubmit}
             disabled={disabled}
             className="submit-button"
+            aria-label="Submit slider position"
           >
             Submit Position
           </button>
@@ -190,7 +200,7 @@ export const GameRenderer: React.FC<GameRendererProps> = ({
     );
   };
 
-  // Render hot/cold meter (for CLUSTER game)
+  // Render hot/cold meter (for hot-cold feedback type)
   const renderHotColdMeter = () => {
     const heat = gameData.lastHeat ?? 0;
 
@@ -206,7 +216,7 @@ export const GameRenderer: React.FC<GameRendererProps> = ({
     );
   };
 
-  // Render score bar
+  // Render score bar (for score-bar feedback type)
   const renderScoreBar = () => {
     const score = gameData.score ?? 0;
     const maxScore = 100;
@@ -280,31 +290,24 @@ export const GameRenderer: React.FC<GameRendererProps> = ({
     );
   };
 
-  // Determine which UI elements to render based on uiSchema
-  const shouldShowWordGrid = uiSchema.primaryInput === 'grid' ||
-    game.id === 'grip' || game.id === 'zero' || game.id === 'ping' ||
-    game.id === 'span' || game.id === 'cluster' || game.id === 'colorglyph' ||
-    game.id === 'trace' || game.id === 'tensor' || game.id === 'one' ||
-    game.id === 'tribes' || game.id === 'ghost' || game.id === 'motif' ||
-    game.id === 'pivotword' || game.id === 'radial' || game.id === 'shard' ||
-    game.id === 'spoke';
+  // SCHEMA-DRIVEN LOGIC: Determine UI elements based on uiSchema, NOT game.id
+  const shouldShowWordGrid =
+    uiSchema.input === 'tap-one' || uiSchema.input === 'tap-many';
 
-  const shouldShowTextInput = uiSchema.primaryInput === 'text' ||
-    game.id === 'flow' || game.id === 'splice' || game.id === 'loop' ||
-    game.id === 'echochain' || game.id === 'merge' || game.id === 'traceword' ||
-    game.id === 'warpword';
+  const shouldShowTextInput = uiSchema.input === 'type-one-word';
 
-  const shouldShowSlider = game.id === 'vector';
+  const shouldShowSlider = uiSchema.layout === 'dual-anchor';
 
-  const shouldShowHotColdMeter = game.id === 'cluster';
+  const shouldShowHotColdMeter = uiSchema.feedback === 'hot-cold';
 
-  const shouldShowScore = gameData.score !== undefined;
+  const shouldShowScoreBar =
+    uiSchema.feedback === 'score-bar' && gameData.score !== undefined;
 
   return (
-    <div className="game-renderer">
+    <div className="game-renderer" role="main" aria-label={`${game.name} game interface`}>
       {renderGameInfo()}
 
-      {shouldShowScore && renderScoreBar()}
+      {shouldShowScoreBar && renderScoreBar()}
 
       {shouldShowHotColdMeter && renderHotColdMeter()}
 
