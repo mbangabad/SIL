@@ -16,6 +16,7 @@ import type {
   GameResultSummary,
   GameMode,
 } from '@sil/core';
+import { telemetry } from '@sil/core';
 
 export interface UseGameSessionConfig {
   game: GameDefinition;
@@ -63,6 +64,7 @@ export function useGameSession(config: UseGameSessionConfig): UseGameSessionRetu
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<GameResultSummary | null>(null);
+  const [startTime, setStartTime] = useState<number>(0);
 
   // Create game context
   const context = useMemo<GameContext>(() => ({
@@ -81,13 +83,33 @@ export function useGameSession(config: UseGameSessionConfig): UseGameSessionRetu
 
       const initialState = await game.init(context);
       setGameState(initialState);
+
+      // Track game session start
+      const now = Date.now();
+      setStartTime(now);
+      telemetry.trackGameStart(
+        game.id,
+        mode,
+        String(context.seed),
+        userId !== 'anonymous' ? userId : undefined
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to initialize game');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to initialize game';
+      setError(errorMessage);
       console.error('Game initialization error:', err);
+
+      // Track error
+      telemetry.trackError(
+        errorMessage,
+        err instanceof Error ? err.stack : undefined,
+        undefined,
+        game.id,
+        userId !== 'anonymous' ? userId : undefined
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [game, context]);
+  }, [game, context, mode, userId]);
 
   // Initialize on mount
   useEffect(() => {
@@ -113,14 +135,36 @@ export function useGameSession(config: UseGameSessionConfig): UseGameSessionRetu
       const newState = game.update(context, gameState, action);
       setGameState(newState);
 
-      // If game is done, generate summary
+      // If game is done, generate summary and track completion
       if (newState.done) {
         const gameSummary = game.summarize(context, newState);
         setSummary(gameSummary);
+
+        // Track game session end
+        const durationMs = Date.now() - startTime;
+        telemetry.trackGameEnd(
+          game.id,
+          mode,
+          gameSummary.score,
+          durationMs,
+          true, // completed
+          gameSummary.skillSignals,
+          userId !== 'anonymous' ? userId : undefined
+        );
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process action');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to process action';
+      setError(errorMessage);
       console.error('Game update error:', err);
+
+      // Track error
+      telemetry.trackError(
+        errorMessage,
+        err instanceof Error ? err.stack : undefined,
+        undefined,
+        game.id,
+        userId !== 'anonymous' ? userId : undefined
+      );
     }
   }, [game, context, gameState]);
 

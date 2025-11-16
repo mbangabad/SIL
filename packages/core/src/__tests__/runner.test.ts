@@ -25,11 +25,11 @@ const createMockGame = (): GameDefinition => ({
     };
   },
 
-  update: async (
+  update: (
     ctx: GameContext,
     state: GameState,
     action: PlayerAction
-  ): Promise<GameState> => {
+  ): GameState => {
     const data = state.data;
     const newAttempts = data.attempts + 1;
 
@@ -52,7 +52,7 @@ const createMockGame = (): GameDefinition => ({
     };
   },
 
-  summarize: async (ctx: GameContext, state: GameState) => {
+  summarize: (ctx: GameContext, state: GameState) => {
     return {
       score: state.data.score,
       durationMs: 0,
@@ -80,18 +80,18 @@ describe('runGame - One-Shot Mode', () => {
       mode: 'oneShot',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
-    const actions: PlayerAction[] = [
-      { type: 'tap', payload: { wordId: '0' } },
-    ];
-
-    const result = await runGame(game, ctx, actions);
+    const result = await runGame({
+      game,
+      mode: 'oneShot',
+      context: ctx,
+      actions: { type: 'tap', payload: { wordId: '0' } },
+    });
 
     expect(result.summary.score).toBe(10); // One action = 10 points
     expect(result.summary.durationMs).toBeGreaterThanOrEqual(0);
-    expect(result.metadata).toHaveProperty('attempts', 1);
+    expect(result.metadata).toHaveProperty('actionCount', 1);
   });
 
   it('should track time correctly', async () => {
@@ -100,15 +100,15 @@ describe('runGame - One-Shot Mode', () => {
       mode: 'oneShot',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
-    const actions: PlayerAction[] = [
-      { type: 'tap', payload: { wordId: '0' } },
-    ];
-
     const start = Date.now();
-    const result = await runGame(game, ctx, actions);
+    const result = await runGame({
+      game,
+      mode: 'oneShot',
+      context: ctx,
+      actions: { type: 'tap', payload: { wordId: '0' } },
+    });
     const end = Date.now();
 
     expect(result.summary.durationMs).toBeGreaterThanOrEqual(0);
@@ -123,7 +123,6 @@ describe('runGame - Journey Mode', () => {
       mode: 'journey',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
     const actions: PlayerAction[] = [
@@ -134,10 +133,15 @@ describe('runGame - Journey Mode', () => {
       { type: 'tap', payload: { wordId: '4' } },
     ];
 
-    const result = await runGame(game, ctx, actions);
+    const result = await runGame({
+      game,
+      mode: 'journey',
+      context: ctx,
+      actions,
+    });
 
     expect(result.summary.score).toBe(50); // 5 actions × 10 points
-    expect(result.metadata.attempts).toBe(5);
+    expect(result.metadata.actualSteps).toBe(5);
   });
 
   it('should track state history', async () => {
@@ -146,7 +150,6 @@ describe('runGame - Journey Mode', () => {
       mode: 'journey',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
     const actions: PlayerAction[] = [
@@ -154,7 +157,12 @@ describe('runGame - Journey Mode', () => {
       { type: 'tap', payload: { wordId: '1' } },
     ];
 
-    const result = await runGame(game, ctx, actions, { recordHistory: true });
+    const result = await runGame({
+      game,
+      mode: 'journey',
+      context: ctx,
+      actions,
+    });
 
     expect(result.history).toBeDefined();
     expect(result.history!.length).toBeGreaterThan(0);
@@ -169,7 +177,6 @@ describe('runGame - Journey Mode', () => {
       mode: 'journey',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
     const actions: PlayerAction[] = [
@@ -178,12 +185,16 @@ describe('runGame - Journey Mode', () => {
       { type: 'tap', payload: { wordId: '2' } },
     ];
 
-    const result = await runGame(game, ctx, actions, {
+    const result = await runGame({
+      game,
+      mode: 'journey',
+      context: ctx,
+      actions,
       modeConfig: { maxSteps: 3 },
     });
 
     // Should end at 3 steps even though game wants 5
-    expect(result.metadata.attempts).toBe(3);
+    expect(result.metadata.actualSteps).toBe(3);
   });
 });
 
@@ -194,7 +205,6 @@ describe('runGame - Arena Mode', () => {
       mode: 'arena',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
     // Simulate rapid actions within time limit
@@ -202,7 +212,11 @@ describe('runGame - Arena Mode', () => {
       .fill(null)
       .map((_, i) => ({ type: 'tap', payload: { wordId: `${i}` } }) as PlayerAction);
 
-    const result = await runGame(game, ctx, actions, {
+    const result = await runGame({
+      game,
+      mode: 'arena',
+      context: ctx,
+      actions,
       modeConfig: { durationMs: 5000 },
     });
 
@@ -216,7 +230,6 @@ describe('runGame - Arena Mode', () => {
       mode: 'arena',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
     const actions: PlayerAction[] = [
@@ -224,7 +237,12 @@ describe('runGame - Arena Mode', () => {
       { type: 'timer' }, // Timer expiration
     ];
 
-    const result = await runGame(game, ctx, actions);
+    const result = await runGame({
+      game,
+      mode: 'arena',
+      context: ctx,
+      actions,
+    });
 
     expect(result).toBeDefined();
     expect(result.summary.score).toBeGreaterThan(0);
@@ -238,23 +256,26 @@ describe('runGame - Endurance Mode', () => {
       mode: 'endurance',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
-    const actions: PlayerAction[] = [
-      { type: 'tap', payload: { wordId: '0' } },
-      { type: 'tap', payload: { wordId: '1' } },
-      { type: 'tap', payload: { wordId: '2' } },
-    ];
-
-    const result = await runGame(game, ctx, actions, {
+    const result = await runGame({
+      game,
+      mode: 'endurance',
+      context: ctx,
       modeConfig: {
-        gameSequence: ['test-game', 'test-game', 'test-game'],
+        games: [game, game, game],
+        gameActions: [
+          [{ type: 'tap', payload: { wordId: '0' } }],
+          [{ type: 'tap', payload: { wordId: '1' } }],
+          [{ type: 'tap', payload: { wordId: '2' } }],
+        ],
       },
     });
 
     expect(result).toBeDefined();
     expect(result.summary.score).toBeGreaterThan(0);
+    expect(result.summary.metadata.gameCount).toBe(3);
+    expect(result.summary.metadata.gameIds).toHaveLength(3);
   });
 
   it('should aggregate scores from multiple games', async () => {
@@ -263,21 +284,35 @@ describe('runGame - Endurance Mode', () => {
       mode: 'endurance',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
-    const actions: PlayerAction[] = Array(6)
-      .fill(null)
-      .map((_, i) => ({ type: 'tap', payload: { wordId: `${i}` } }) as PlayerAction);
-
-    const result = await runGame(game, ctx, actions, {
+    const result = await runGame({
+      game,
+      mode: 'endurance',
+      context: ctx,
       modeConfig: {
-        gameSequence: ['test-game', 'test-game'], // Two instances
+        games: [game, game, game], // Three instances (minimum)
+        gameActions: [
+          [
+            { type: 'tap', payload: { wordId: '0' } },
+            { type: 'tap', payload: { wordId: '1' } },
+          ],
+          [
+            { type: 'tap', payload: { wordId: '2' } },
+            { type: 'tap', payload: { wordId: '3' } },
+          ],
+          [
+            { type: 'tap', payload: { wordId: '4' } },
+            { type: 'tap', payload: { wordId: '5' } },
+          ],
+        ],
       },
     });
 
-    // Should aggregate scores from both game instances
+    // Should aggregate scores from all game instances
     expect(result.summary.score).toBeGreaterThan(10);
+    expect(result.summary.metadata.gameCount).toBe(3);
+    expect(result.summary.metadata.totalScore).toBeGreaterThan(30); // 3 games × 2 actions × 10 points
   });
 });
 
@@ -294,16 +329,22 @@ describe('runGame - Error Handling', () => {
       mode: 'oneShot',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
-    await expect(runGame(brokenGame, ctx, [])).rejects.toThrow('Init failed');
+    await expect(
+      runGame({
+        game: brokenGame,
+        mode: 'oneShot',
+        context: ctx,
+        actions: { type: 'tap', payload: { wordId: '0' } },
+      })
+    ).rejects.toThrow('Init failed');
   });
 
   it('should handle game update errors', async () => {
     const brokenGame: GameDefinition = {
       ...createMockGame(),
-      update: async () => {
+      update: () => {
         throw new Error('Update failed');
       },
     };
@@ -312,57 +353,59 @@ describe('runGame - Error Handling', () => {
       mode: 'oneShot',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
-    const actions: PlayerAction[] = [
-      { type: 'tap', payload: { wordId: '0' } },
-    ];
-
-    await expect(runGame(brokenGame, ctx, actions)).rejects.toThrow('Update failed');
+    await expect(
+      runGame({
+        game: brokenGame,
+        mode: 'oneShot',
+        context: ctx,
+        actions: { type: 'tap', payload: { wordId: '0' } },
+      })
+    ).rejects.toThrow('Update failed');
   });
 
-  it('should handle empty actions gracefully', async () => {
+  it('should require actions for oneShot mode', async () => {
     const game = createMockGame();
     const ctx: GameContext = {
       mode: 'oneShot',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
-    const result = await runGame(game, ctx, []);
-
-    // Should return initial state summary
-    expect(result).toBeDefined();
-    expect(result.summary.score).toBe(0);
+    await expect(
+      runGame({
+        game,
+        mode: 'oneShot',
+        context: ctx,
+      })
+    ).rejects.toThrow('One-shot mode requires a single action');
   });
 });
 
 describe('runGame - Configuration', () => {
-  it('should respect recordHistory flag', async () => {
+  it('should track state history in journey mode', async () => {
     const game = createMockGame();
     const ctx: GameContext = {
       mode: 'journey',
       seed: 'test-seed',
       language: 'en',
-      now: Date.now(),
     };
 
     const actions: PlayerAction[] = [
       { type: 'tap', payload: { wordId: '0' } },
     ];
 
-    const resultWithHistory = await runGame(game, ctx, actions, {
-      recordHistory: true,
+    const result = await runGame({
+      game,
+      mode: 'journey',
+      context: ctx,
+      actions,
     });
 
-    const resultWithoutHistory = await runGame(game, ctx, actions, {
-      recordHistory: false,
-    });
-
-    expect(resultWithHistory.history).toBeDefined();
-    expect(resultWithoutHistory.history).toBeUndefined();
+    // Journey mode always includes history
+    expect(result.history).toBeDefined();
+    expect(result.history!.length).toBeGreaterThan(0);
   });
 
   it('should use deterministic seed for reproducibility', async () => {
@@ -371,15 +414,21 @@ describe('runGame - Configuration', () => {
       mode: 'oneShot',
       seed: 'reproducible-seed',
       language: 'en',
-      now: Date.now(),
     };
 
-    const actions: PlayerAction[] = [
-      { type: 'tap', payload: { wordId: '0' } },
-    ];
+    const result1 = await runGame({
+      game,
+      mode: 'oneShot',
+      context: ctx,
+      actions: { type: 'tap', payload: { wordId: '0' } },
+    });
 
-    const result1 = await runGame(game, ctx, actions);
-    const result2 = await runGame(game, ctx, actions);
+    const result2 = await runGame({
+      game,
+      mode: 'oneShot',
+      context: ctx,
+      actions: { type: 'tap', payload: { wordId: '0' } },
+    });
 
     // Same seed should produce same results
     expect(result1.summary.score).toBe(result2.summary.score);

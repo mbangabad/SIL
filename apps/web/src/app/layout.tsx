@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { PageViewTracker } from '@/components/PageViewTracker'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 
@@ -17,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-body bg-background text-white`}>
+        <PageViewTracker />
         {children}
       </body>
     </html>
