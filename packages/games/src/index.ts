@@ -38,6 +38,41 @@ export { spokeGame } from './spoke';
 export { warpwordGame } from './warpword';
 export { vectorGame } from './vector';
 
+// Math/Logic Games - Batch 1: Spatial & Numeric Foundation
+export { alignGame } from './align';
+export { numgripGame } from './numgrip';
+export { span2dGame } from './span2d';
+export { gridlogicGame } from './gridlogic';
+export { shiftGame } from './shift';
+
+// Math/Logic Games - Batch 2: Optimization & Pattern
+export { optimaGame } from './optima';
+export { nextGame } from './next';
+export { rotorGame } from './rotor';
+export { midpointGame } from './midpoint';
+export { inverseGame } from './inverse';
+
+// Math/Logic Games - Batch 3: Risk & Transformation
+export { riskGame } from './risk';
+export { angleGame } from './angle';
+export { tiltGame } from './tilt';
+export { flipGame } from './flip';
+export { matchrateGame } from './matchrate';
+
+// Math/Logic Games - Batch 4: Decision & Proportion
+export { jumpGame } from './jump';
+export { balanceGame } from './balance';
+export { choiceGame } from './choice';
+export { spreadGame } from './spread';
+export { harmonyGame } from './harmony';
+
+// Math/Logic Games - Batch 5: Sequence & Combination
+export { orderGame } from './order';
+export { growthGame } from './growth';
+export { pairGame } from './pair';
+export { packGame } from './pack';
+export { fuseGame } from './fuse';
+
 import { gripGame } from './grip';
 import { zeroGame } from './zero';
 import { pingGame } from './ping';
@@ -70,11 +105,46 @@ import { spokeGame } from './spoke';
 import { warpwordGame } from './warpword';
 import { vectorGame } from './vector';
 
+// Math/Logic Games - Batch 1 imports
+import { alignGame } from './align';
+import { numgripGame } from './numgrip';
+import { span2dGame } from './span2d';
+import { gridlogicGame } from './gridlogic';
+import { shiftGame } from './shift';
+
+// Math/Logic Games - Batch 2 imports
+import { optimaGame } from './optima';
+import { nextGame } from './next';
+import { rotorGame } from './rotor';
+import { midpointGame } from './midpoint';
+import { inverseGame } from './inverse';
+
+// Math/Logic Games - Batch 3 imports
+import { riskGame } from './risk';
+import { angleGame } from './angle';
+import { tiltGame } from './tilt';
+import { flipGame } from './flip';
+import { matchrateGame } from './matchrate';
+
+// Math/Logic Games - Batch 4 imports
+import { jumpGame } from './jump';
+import { balanceGame } from './balance';
+import { choiceGame } from './choice';
+import { spreadGame } from './spread';
+import { harmonyGame } from './harmony';
+
+// Math/Logic Games - Batch 5 imports
+import { orderGame } from './order';
+import { growthGame } from './growth';
+import { pairGame } from './pair';
+import { packGame } from './pack';
+import { fuseGame } from './fuse';
+
 import type { GameDefinition } from '@sil/core';
 
 /**
- * Registry of all available games (25 total)
- * 12 original games + 13 semantic word games
+ * Registry of all available games (50 total)
+ * 12 original games + 13 semantic word games + 25 math/logic games
  */
 export const ALL_GAMES: GameDefinition[] = [
   // Original 12 games
@@ -109,6 +179,41 @@ export const ALL_GAMES: GameDefinition[] = [
   spokeGame,
   warpwordGame,
   vectorGame,
+
+  // Math/Logic Games - Batch 1: Spatial & Numeric Foundation (5 games)
+  alignGame,
+  numgripGame,
+  span2dGame,
+  gridlogicGame,
+  shiftGame,
+
+  // Math/Logic Games - Batch 2: Optimization & Pattern (5 games)
+  optimaGame,
+  nextGame,
+  rotorGame,
+  midpointGame,
+  inverseGame,
+
+  // Math/Logic Games - Batch 3: Risk & Transformation (5 games)
+  riskGame,
+  angleGame,
+  tiltGame,
+  flipGame,
+  matchrateGame,
+
+  // Math/Logic Games - Batch 4: Decision & Proportion (5 games)
+  jumpGame,
+  balanceGame,
+  choiceGame,
+  spreadGame,
+  harmonyGame,
+
+  // Math/Logic Games - Batch 5: Sequence & Combination (5 games)
+  orderGame,
+  growthGame,
+  pairGame,
+  packGame,
+  fuseGame,
 ];
 
 /**
