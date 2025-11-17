@@ -186,7 +186,7 @@ router.get('/:seasonId/leaderboard', async (req, res) => {
       });
     }
 
-    const leaderboard = entries?.map((entry, index) => ({
+    const leaderboard = (entries as any[])?.map((entry: any, index: number) => ({
       ...entry,
       rank: Number(offset) + index + 1,
       username: entry.users?.username || 'Anonymous',
@@ -208,12 +208,12 @@ router.get('/:seasonId/leaderboard', async (req, res) => {
           .from('user_season_progress')
           .select('*', { count: 'exact', head: true })
           .eq('season_id', seasonId)
-          .gt('total_score', userEntry.total_score);
+          .gt('total_score', (userEntry as any).total_score);
 
         userPosition = {
           rank: (betterCount || 0) + 1,
-          score: userEntry.total_score,
-          tier: userEntry.tier,
+          score: (userEntry as any).total_score,
+          tier: (userEntry as any).tier,
         };
       }
     }
@@ -323,7 +323,7 @@ router.post('/:seasonId/milestones/claim', async (req, res) => {
     }
 
     // Check if milestone already claimed
-    if (progress.milestones_completed?.includes(milestoneId)) {
+    if ((progress as any).milestones_completed?.includes(milestoneId)) {
       return res.status(400).json({
         success: false,
         error: 'Milestone already claimed',
@@ -344,7 +344,7 @@ router.post('/:seasonId/milestones/claim', async (req, res) => {
       });
     }
 
-    const milestone = season.milestones?.find((m: any) => m.id === milestoneId);
+    const milestone = (season as any).milestones?.find((m: any) => m.id === milestoneId);
     if (!milestone) {
       return res.status(404).json({
         success: false,
@@ -353,7 +353,7 @@ router.post('/:seasonId/milestones/claim', async (req, res) => {
     }
 
     // Verify milestone is achievable
-    const isAchieved = progress.total_score >= milestone.requirement;
+    const isAchieved = (progress as any).total_score >= milestone.requirement;
     if (!isAchieved) {
       return res.status(400).json({
         success: false,
@@ -365,9 +365,9 @@ router.post('/:seasonId/milestones/claim', async (req, res) => {
     const { error: updateError } = await supabase
       .from('user_season_progress')
       .update({
-        milestones_completed: [...(progress.milestones_completed || []), milestoneId],
+        milestones_completed: [...((progress as any).milestones_completed || []), milestoneId],
         updated_at: new Date().toISOString(),
-      })
+      } as any)
       .eq('season_id', seasonId)
       .eq('user_id', userId);
 
