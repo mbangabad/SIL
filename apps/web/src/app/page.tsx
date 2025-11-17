@@ -1,20 +1,20 @@
 import Link from 'next/link';
-import { ALL_GAMES } from '@sil/games';
-import { EmailCapture } from '@/components/EmailCapture';
+// import { ALL_GAMES } from '@sil/games'; // TODO: Fix package import
+import { EmailCapture } from '../components/EmailCapture';
+
+// Temporary mock data for deployment
+const mockGames = [
+  { id: 'grip', name: 'Grip', shortDescription: 'Pattern memory' },
+  { id: 'zero', name: 'Zero', shortDescription: 'Fast elimination' },
+  { id: 'tribes', name: 'Tribes', shortDescription: 'Word categorization' },
+  { id: 'align', name: 'Align', shortDescription: 'Number patterns' }
+];
 
 export default function Home() {
-  // Organize games by category
-  const originalGames = ALL_GAMES.filter(g =>
-    ['grip', 'zero', 'ping', 'span', 'cluster', 'colorglyph', 'trace', 'flow', 'tensor', 'splice', 'one', 'loop'].includes(g.id)
-  );
-
-  const semanticGames = ALL_GAMES.filter(g =>
-    ['tribes', 'echochain', 'ghost', 'motif', 'flock', 'merge', 'pivotword', 'radial', 'traceword', 'shard', 'spoke', 'warpword', 'vector'].includes(g.id)
-  );
-
-  const mathLogicGames = ALL_GAMES.filter(g =>
-    ['align', 'numgrip', 'span2d', 'gridlogic', 'shift', 'optima', 'next', 'rotor', 'midpoint', 'inverse', 'risk', 'angle', 'tilt', 'flip', 'matchrate', 'jump', 'balance', 'choice', 'spread', 'harmony', 'order', 'growth', 'pair', 'pack', 'fuse'].includes(g.id)
-  );
+  // Organize games by category - using mock data temporarily
+  const originalGames = mockGames.slice(0, 2);
+  const semanticGames = mockGames.slice(2, 3);
+  const mathLogicGames = mockGames.slice(3, 4);
 
   return (
     <main className="min-h-screen bg-slate-950">

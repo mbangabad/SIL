@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { ScoreBar } from '@sil/ui';
+// import { ScoreBar } from '@sil/ui'; // Temporarily disabled
 
 interface Season {
   id: string;
@@ -213,12 +213,12 @@ export default function SeasonPage() {
                         {progress.totalScore} / Next Tier
                       </span>
                     </div>
-                    <ScoreBar
-                      current={75}
-                      max={100}
-                      label=""
-                      showPercentage={false}
-                    />
+                    <div className="bg-slate-800 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                        style={{ width: '75%' }}
+                      ></div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -268,12 +268,12 @@ export default function SeasonPage() {
                                 {Math.round(progressPercent)}%
                               </span>
                             </div>
-                            <ScoreBar
-                              current={progressPercent}
-                              max={100}
-                              label=""
-                              showPercentage={false}
-                            />
+                            <div className="bg-slate-800 rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                                style={{ width: `${progressPercent}%` }}
+                              ></div>
+                            </div>
                           </div>
                         )}
                         {milestone.reward && (

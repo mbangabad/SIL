@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { PageViewTracker } from '@/components/PageViewTracker'
+import { PageViewTracker } from '../components/PageViewTracker'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 
