@@ -6,7 +6,20 @@
 
 import { Router } from 'express';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import type { LeaderboardEntry } from '../types/database';
+import type { LeaderboardDailyEntry, Friendship } from '../types/database';
+
+// Type for leaderboard entry with joined user data
+type LeaderboardEntryWithUser = LeaderboardDailyEntry & {
+  users?: {
+    username: string | null;
+    display_name: string | null;
+  } | null;
+};
+
+// Type for friendship with user data
+type FriendshipWithUser = Friendship & {
+  friend_id: string;
+};
 
 const router = Router();
 
@@ -58,7 +71,7 @@ router.get('/:gameId/:mode', async (req, res) => {
     }
 
     // Add tiers and format
-    const entriesWithTiers = entries?.map((entry, index) => ({
+    const entriesWithTiers = (entries as LeaderboardEntryWithUser[])?.map((entry, index) => ({
       ...entry,
       rank: Number(offset) + index + 1,
       tier: calculateTier(Number(offset) + index + 1),
@@ -123,7 +136,7 @@ router.get('/:gameId/:mode/daily', async (req, res) => {
       });
     }
 
-    const entriesWithTiers = entries?.map((entry, index) => ({
+    const entriesWithTiers = (entries as LeaderboardEntryWithUser[])?.map((entry, index) => ({
       ...entry,
       rank: index + 1,
       tier: calculateTier(index + 1),
@@ -183,7 +196,7 @@ router.get('/:gameId/:mode/friends', async (req, res) => {
       });
     }
 
-    const friendIds = friendships?.map(f => f.friend_id) || [];
+    const friendIds = (friendships as FriendshipWithUser[])?.map(f => f.friend_id) || [];
     const allUserIds = [...friendIds, userId];
 
     if (allUserIds.length === 0) {
@@ -213,7 +226,7 @@ router.get('/:gameId/:mode/friends', async (req, res) => {
       });
     }
 
-    const rankedEntries = entries?.map((entry, index) => ({
+    const rankedEntries = (entries as LeaderboardEntryWithUser[])?.map((entry, index) => ({
       ...entry,
       rank: index + 1,
       username: entry.users?.username || 'Anonymous',
