@@ -18,8 +18,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@sil/core": "workspace:*",
-    "@sil/semantics": "workspace:*"
+    "@sil/core": "file:../core",
+    "@sil/semantics": "file:../semantics"
   },
   "devDependencies": {
     "@types/node": "^20.12.0",

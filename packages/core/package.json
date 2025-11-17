@@ -8,6 +8,14 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./experiments": {
+      "import": "./dist/experiments.js",
+      "types": "./dist/experiments.d.ts"
+    },
+    "./progression": {
+      "import": "./dist/progression.js",
+      "types": "./dist/progression.d.ts"
     }
   },
   "scripts": {

@@ -7,11 +7,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@sil/core": ["../../packages/core/src"],
-      "@sil/games": ["../../packages/games/src"],
-      "@sil/semantics": ["../../packages/semantics/src"],
-      "@sil/ui": ["../../packages/ui/src"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -19,7 +19,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@sil/core": "workspace:*",
+    "@sil/core": "file:../core",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
   },

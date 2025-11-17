@@ -18,7 +18,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@sil/core": "workspace:*",
+    "@sil/core": "file:../core",
     "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
