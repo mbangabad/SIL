@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Build outputs (except web app)
+apps/api/dist/
+packages/*/dist/
+
+# Development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Testing
+coverage/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation that's not needed for deployment
+*.md
+!README.md

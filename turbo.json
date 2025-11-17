@@ -4,7 +4,8 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": ["NODE_ENV"]
     },
     "dev": {
       "cache": false,
@@ -15,6 +16,10 @@
       "outputs": ["coverage/**"]
     },
     "lint": {
+      "outputs": []
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "clean": {
