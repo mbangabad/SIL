@@ -1,17 +1,6 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "apps/web/.next",
-  "framework": null,
-  "regions": ["iad1"],
-  "functions": {
-    "apps/web/src/app/api/**": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "env": {
-    "NODE_ENV": "production",
-    "FORCE_INSTALL_ENGINE_CHECK": "false"
-  }
+  "buildCommand": "cd apps/web && npm ci && npm run build && cd ../../ && cp -r apps/web/.next .next",
+  "outputDirectory": ".next",
+  "installCommand": "echo 'Skipping root install'"
 }
