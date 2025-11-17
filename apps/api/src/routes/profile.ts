@@ -182,6 +182,7 @@ router.get('/:userId/stats', async (req, res) => {
     });
   }
 });
+
 /**
  * GET /api/profile/:userId/history
  * Get user's game session history
@@ -189,7 +190,11 @@ router.get('/:userId/stats', async (req, res) => {
 router.get('/:userId/history', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { limit = 20, offset = 0, gameId, mode } = req.query;
+    const { limit = '20', offset = '0', gameId, mode } = req.query;
+
+    // Convert query parameters to numbers
+    const limitNum = Number(limit);
+    const offsetNum = Number(offset);
 
     // TODO: Fetch from database
     // let query = 'SELECT * FROM game_sessions WHERE user_id = $1';
@@ -223,7 +228,7 @@ router.get('/:userId/history', async (req, res) => {
       success: true,
       sessions: mockHistory,
       total: 45,
-      hasMore: Number(offset) + mockHistory.length < 45,
+      hasMore: offsetNum + mockHistory.length < 45,
     });
   } catch (error) {
     console.error('History fetch error:', error);
