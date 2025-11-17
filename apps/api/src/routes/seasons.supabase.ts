@@ -362,12 +362,12 @@ router.post('/:seasonId/milestones/claim', async (req, res) => {
     }
 
     // Update progress with claimed milestone
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from('user_season_progress')
       .update({
         milestones_completed: [...((progress as any).milestones_completed || []), milestoneId],
         updated_at: new Date().toISOString(),
-      } as any)
+      })
       .eq('season_id', seasonId)
       .eq('user_id', userId);
 

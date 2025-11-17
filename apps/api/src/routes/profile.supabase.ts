@@ -85,7 +85,7 @@ router.put('/:userId', async (req, res) => {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('users')
       .update(updateData)
       .eq('id', userId)
@@ -135,7 +135,7 @@ router.get('/:userId/brainprint', async (req, res) => {
       .eq('id', userId)
       .single();
 
-    const userData = user as User;
+    const userData = user as unknown as User;
     if (error || !userData || !userData.brainprint) {
       return res.status(404).json({
         success: false,
