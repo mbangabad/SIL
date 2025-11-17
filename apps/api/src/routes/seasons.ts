@@ -54,7 +54,8 @@ router.get('/active', async (req, res) => {
           },
         ],
         tierThresholds: {
-          bronze: 0,
+          novice: 0,
+          bronze: 20,
           silver: 50,
           gold: 70,
           platinum: 85,
@@ -164,7 +165,11 @@ router.get('/:seasonId/progress/:userId', async (req, res) => {
 router.get('/:seasonId/leaderboard', async (req, res) => {
   try {
     const { seasonId } = req.params;
-    const { limit = 50, offset = 0, userId } = req.query;
+    const { limit = '50', offset = '0', userId } = req.query;
+
+    // Convert query parameters to numbers
+    const limitNum = Number(limit);
+    const offsetNum = Number(offset);
 
     // TODO: Fetch from database
     // const entries = await db.query(`
@@ -174,7 +179,7 @@ router.get('/:seasonId/leaderboard', async (req, res) => {
     //   WHERE usp.season_id = $1
     //   ORDER BY usp.total_score DESC
     //   LIMIT $2 OFFSET $3
-    // `, [seasonId, limit, offset]);
+    // `, [seasonId, limitNum, offsetNum]);
 
     const mockLeaderboard = [
       {
@@ -229,7 +234,7 @@ router.get('/:seasonId/leaderboard', async (req, res) => {
       seasonId,
       leaderboard: mockLeaderboard,
       total: 1250,
-      hasMore: Number(offset) + mockLeaderboard.length < 1250,
+      hasMore: offsetNum + mockLeaderboard.length < 1250,
       userPosition,
     });
   } catch (error) {
