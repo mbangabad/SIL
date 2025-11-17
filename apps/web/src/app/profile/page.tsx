@@ -9,7 +9,7 @@ import React, { useMemo, useState } from 'react';
 import { telemetry } from '@sil/core';
 import type { GameSessionEndEvent } from '@sil/core';
 import { ALL_GAMES } from '@sil/games';
-import { type PlayerProgress, initializeProgress, xpProgressToNextLevel } from '@sil/core/progression';
+import { type PlayerProgress, initializeProgress, xpProgressToNextLevel } from '@sil/core';
 
 const BRAINPRINT_DIMENSIONS = [
   { id: 'semantic_precision', name: 'Semantic Precision', description: 'Accuracy in semantic judgments' },

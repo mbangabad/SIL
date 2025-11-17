@@ -8,7 +8,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { telemetry } from '@sil/core';
 import type { TelemetryEvent, GameSessionEndEvent, GameSessionStartEvent, ErrorEvent } from '@sil/core';
-import { EXPERIMENTS, FEATURE_FLAGS, experimentService, type Experiment, type FeatureFlag } from '@sil/core/experiments';
+import { EXPERIMENTS, FEATURE_FLAGS, experimentService, type Experiment, type FeatureFlag } from '@sil/core';
 import { ALL_GAMES } from '@sil/games';
 
 export default function AdvancedAdminDashboard() {

@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { telemetry } from '@sil/core';
 import {type GameSessionEndEvent } from '@sil/core';
 import { ALL_GAMES } from '@sil/games';
-import { getRecommendedGames, type PlayerProgress, initializeProgress } from '@sil/core/progression';
+import { getRecommendedGames, type PlayerProgress, initializeProgress } from '@sil/core';
 
 export default function TodayPage() {
   // In production, load from database or localStorage
