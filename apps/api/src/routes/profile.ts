@@ -182,7 +182,7 @@ router.get('/:userId/stats', async (req, res) => {
     });
   }
 });
-
+hasMore: offset + mockHistory.length < 45,
 /**
  * GET /api/profile/:userId/history
  * Get user's game session history
