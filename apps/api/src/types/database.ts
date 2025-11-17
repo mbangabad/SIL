@@ -67,8 +67,8 @@ export interface GameSession {
 }
 
 /**
- * Leaderboard Entry - Union type for daily and global entries
- * Used throughout leaderboard APIs
+ * Leaderboard Entry type for API use
+ * Can represent either daily or global entries
  */
 export type LeaderboardEntry = LeaderboardDailyEntry | LeaderboardGlobalEntry;
 
