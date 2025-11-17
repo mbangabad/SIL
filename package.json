@@ -9,7 +9,9 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
+    "build": "npm run build:packages && cd apps/web && npm run build",
+    "build:packages": "cd packages/core && npm run build && cd ../ui && npm run build && cd ../semantics && npm run build && cd ../games && npm run build",
+    "build:turbo": "turbo run build",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
