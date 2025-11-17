@@ -40,7 +40,6 @@ export interface Brainprint {
   decisiveness?: number;
   closure?: number;
   circularity?: number;
-
   // Meta information
   lastUpdated?: Date;
   totalGames?: number;
@@ -53,23 +52,25 @@ export interface GameSession {
   game_id: string;
   mode: 'oneShot' | 'journey' | 'arena' | 'endurance';
   seed: string;
-
   initial_state: any;
   final_state: any;
   score: number;
   accuracy: number | null;
   percentile: number | null;
-
   duration_ms: number;
   actions_count: number;
-
   skill_signals: Record<string, number>;
   metadata: any;
-
   started_at: Date;
   completed_at: Date;
   created_at: Date;
 }
+
+/**
+ * Leaderboard Entry - Union type for daily and global entries
+ * Used throughout leaderboard APIs
+ */
+export type LeaderboardEntry = LeaderboardDailyEntry | LeaderboardGlobalEntry;
 
 export interface LeaderboardDailyEntry {
   id: string;
@@ -82,6 +83,10 @@ export interface LeaderboardDailyEntry {
   rank: number | null;
   session_id: string;
   created_at: Date;
+  users?: {
+    username: string | null;
+    display_name: string | null;
+  };
 }
 
 export interface LeaderboardGlobalEntry {
@@ -96,6 +101,10 @@ export interface LeaderboardGlobalEntry {
   rank: number | null;
   updated_at: Date;
   created_at: Date;
+  users?: {
+    username: string | null;
+    display_name: string | null;
+  };
 }
 
 export interface Season {
@@ -106,7 +115,9 @@ export interface Season {
   start_date: Date;
   end_date: Date;
   is_active: boolean;
+  status?: 'active' | 'upcoming' | 'completed';
   config: SeasonConfig;
+  milestones?: Milestone[];
   created_at: Date;
 }
 
@@ -114,6 +125,7 @@ export interface SeasonConfig {
   games?: string[]; // List of game IDs included in this season
   milestones?: Milestone[];
   tierThresholds?: {
+    novice: number;
     bronze: number;
     silver: number;
     gold: number;
@@ -130,18 +142,25 @@ export interface Milestone {
   reward?: string;
 }
 
+/**
+ * User Season Progress - includes 'novice' tier
+ */
 export interface UserSeasonProgress {
-  id: string;
+  id?: string;
   user_id: string;
   season_id: string;
   total_score: number;
   games_played: number;
   rank: number | null;
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+  tier: 'novice' | 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
   milestones_completed: string[];
-  badges_earned: string[];
+  badges_earned?: string[];
   updated_at: Date;
   created_at: Date;
+  users?: {
+    username: string | null;
+    display_name: string | null;
+  };
 }
 
 export interface Badge {
@@ -189,4 +208,73 @@ export interface UserStats {
   average_score: number;
   best_score: number;
   badges_count: number;
+}
+
+/**
+ * Root Database type for Supabase client
+ * This is required by createClient<Database>()
+ */
+export interface Database {
+  public: {
+    Tables: {
+      users: {
+        Row: User;
+        Insert: Omit<User, 'created_at' | 'updated_at'>;
+        Update: Partial<User>;
+      };
+      game_sessions: {
+        Row: GameSession;
+        Insert: Omit<GameSession, 'created_at'>;
+        Update: Partial<GameSession>;
+      };
+      leaderboard_entries: {
+        Row: LeaderboardDailyEntry;
+        Insert: Omit<LeaderboardDailyEntry, 'created_at'>;
+        Update: Partial<LeaderboardDailyEntry>;
+      };
+      leaderboard_global: {
+        Row: LeaderboardGlobalEntry;
+        Insert: Omit<LeaderboardGlobalEntry, 'created_at' | 'updated_at'>;
+        Update: Partial<LeaderboardGlobalEntry>;
+      };
+      seasons: {
+        Row: Season;
+        Insert: Omit<Season, 'created_at'>;
+        Update: Partial<Season>;
+      };
+      user_season_progress: {
+        Row: UserSeasonProgress;
+        Insert: Omit<UserSeasonProgress, 'created_at' | 'updated_at' | 'id'>;
+        Update: Partial<UserSeasonProgress>;
+      };
+      badges: {
+        Row: Badge;
+        Insert: Omit<Badge, 'created_at'>;
+        Update: Partial<Badge>;
+      };
+      user_badges: {
+        Row: UserBadge;
+        Insert: UserBadge;
+        Update: Partial<UserBadge>;
+      };
+      friendships: {
+        Row: Friendship;
+        Insert: Omit<Friendship, 'created_at' | 'updated_at'>;
+        Update: Partial<Friendship>;
+      };
+    };
+    Views: {
+      user_stats: {
+        Row: UserStats;
+      };
+    };
+    Functions: {};
+    Enums: {
+      user_tier: 'free' | 'pro' | 'elite';
+      season_tier: 'novice' | 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+      game_mode: 'oneShot' | 'journey' | 'arena' | 'endurance';
+      friendship_status: 'pending' | 'accepted' | 'blocked';
+      badge_rarity: 'common' | 'rare' | 'epic' | 'legendary';
+    };
+  };
 }
