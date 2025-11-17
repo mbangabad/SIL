@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "pnpm install && pnpm run build",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "apps/web/.next",
   "framework": null,
   "regions": ["iad1"],
@@ -11,6 +11,7 @@
     }
   },
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "FORCE_INSTALL_ENGINE_CHECK": "false"
   }
 }
