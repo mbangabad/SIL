@@ -182,7 +182,6 @@ router.get('/:userId/stats', async (req, res) => {
     });
   }
 });
-hasMore: offset + mockHistory.length < 45,
 /**
  * GET /api/profile/:userId/history
  * Get user's game session history
@@ -224,7 +223,7 @@ router.get('/:userId/history', async (req, res) => {
       success: true,
       sessions: mockHistory,
       total: 45,
-      hasMore: offset + mockHistory.length < 45,
+      hasMore: Number(offset) + mockHistory.length < 45,
     });
   } catch (error) {
     console.error('History fetch error:', error);
