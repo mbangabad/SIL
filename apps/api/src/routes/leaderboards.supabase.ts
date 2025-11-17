@@ -277,7 +277,7 @@ router.get('/:gameId/:mode/stats', async (req, res) => {
       });
     }
 
-    const scores = data.map(entry => entry.score);
+    const scores = (data as any[]).map((entry: any) => entry.score);
     const totalPlayers = scores.length;
     const averageScore = totalPlayers > 0
       ? scores.reduce((sum, s) => sum + s, 0) / totalPlayers
@@ -334,17 +334,19 @@ router.post('/:gameId/:mode/submit', async (req, res) => {
     }
 
     // Insert or update leaderboard entry
+    const entryData = {
+      user_id: userId,
+      game_id: gameId,
+      mode,
+      score,
+      session_id: sessionId,
+      metadata,
+      created_at: new Date().toISOString(),
+    };
+
     const { data: entry, error } = await supabase
       .from('leaderboard_entries')
-      .upsert({
-        user_id: userId,
-        game_id: gameId,
-        mode,
-        score,
-        session_id: sessionId,
-        metadata,
-        created_at: new Date().toISOString(),
-      })
+      .upsert(entryData as any)
       .select()
       .single();
 

@@ -6,8 +6,16 @@
 
 import { Router } from 'express';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import type { User, Brainprint } from '../types/database';
+import type { User, Brainprint, GameSession } from '../types/database';
 import { getTopSkills, generateBrainprintInsights } from '../services/brainprint';
+
+// Type for user update data
+type UserUpdateData = {
+  username?: string;
+  display_name?: string;
+  language?: string;
+  updated_at: string;
+};
 
 const router = Router();
 
@@ -70,14 +78,16 @@ router.put('/:userId', async (req, res) => {
     }
 
     // Update user in Supabase
+    const updateData: UserUpdateData = {
+      username,
+      display_name: displayName,
+      language,
+      updated_at: new Date().toISOString(),
+    };
+
     const { data, error } = await supabase
       .from('users')
-      .update({
-        username,
-        display_name: displayName,
-        language,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', userId)
       .select()
       .single();
@@ -125,14 +135,15 @@ router.get('/:userId/brainprint', async (req, res) => {
       .eq('id', userId)
       .single();
 
-    if (error || !user || !user.brainprint) {
+    const userData = user as User;
+    if (error || !userData || !userData.brainprint) {
       return res.status(404).json({
         success: false,
         error: 'Brainprint not found',
       });
     }
 
-    const brainprint = user.brainprint as Brainprint;
+    const brainprint = userData.brainprint as Brainprint;
     const topSkills = getTopSkills(brainprint, 5);
     const insights = generateBrainprintInsights(brainprint);
 
@@ -181,18 +192,19 @@ router.get('/:userId/stats', async (req, res) => {
     }
 
     // Aggregate statistics
-    const totalGames = sessions?.length || 0;
+    const sessionData = sessions as GameSession[];
+    const totalGames = sessionData?.length || 0;
     const averageScore =
       totalGames > 0
-        ? sessions!.reduce((sum, s) => sum + s.score, 0) / totalGames
+        ? sessionData!.reduce((sum, s) => sum + s.score, 0) / totalGames
         : 0;
 
-    const gamesPerMode = sessions?.reduce((acc, s) => {
+    const gamesPerMode = sessionData?.reduce((acc, s) => {
       acc[s.mode] = (acc[s.mode] || 0) + 1;
       return acc;
     }, {} as Record<string, number>) || {};
 
-    const favoriteGames = sessions
+    const favoriteGames = sessionData
       ?.reduce((acc, s) => {
         acc[s.game_id] = (acc[s.game_id] || 0) + 1;
         return acc;
@@ -206,11 +218,11 @@ router.get('/:userId/stats', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-    const playedToday = sessions?.some(
-      s => s.created_at.split('T')[0] === today
+    const playedToday = sessionData?.some(
+      s => s.created_at.toString().split('T')[0] === today
     );
-    const playedYesterday = sessions?.some(
-      s => s.created_at.split('T')[0] === yesterday
+    const playedYesterday = sessionData?.some(
+      s => s.created_at.toString().split('T')[0] === yesterday
     );
 
     const currentStreak = playedToday ?
@@ -222,8 +234,8 @@ router.get('/:userId/stats', async (req, res) => {
       gamesPerMode,
       favoriteGame: topGame ? topGame[0] : null,
       currentStreak,
-      bestScore: sessions && sessions.length > 0
-        ? Math.max(...sessions.map(s => s.score))
+      bestScore: sessionData && sessionData.length > 0
+        ? Math.max(...sessionData.map(s => s.score))
         : 0,
     };
 
