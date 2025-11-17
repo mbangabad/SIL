@@ -10,9 +10,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@sil/core": "workspace:*",
-    "@sil/games": "workspace:*",
-    "@sil/semantics": "workspace:*",
+    "@sil/core": "file:../../packages/core",
+    "@sil/games": "file:../../packages/games",
+    "@sil/semantics": "file:../../packages/semantics",
     "@supabase/supabase-js": "^2.39.0",
     "express": "^4.19.0",
     "cors": "^2.8.5",
